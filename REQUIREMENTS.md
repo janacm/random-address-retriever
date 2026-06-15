@@ -107,13 +107,29 @@ The image mounts at:
 
 ## Performance Requirements
 
-The database is read-heavy after import.
+Only read performance matters for this project.
+
+The database is read-heavy after import. Lookups (exact city count and random
+address retrieval) are the only operations whose latency we care about and the
+only target for any future profiling or optimization.
+
+Write performance is explicitly out of scope:
+
+- Import/`COPY` throughput, `fsync` latency, checkpoints, and WAL behavior are
+  not optimization targets.
+- This is acceptable because `nar_addresses` is `UNLOGGED`, the table is loaded
+  once and then queried, and the source CSVs are retained so it can be rebuilt.
+- The ExFAT/sparseimage storage stack has a large `fsync`/write penalty
+  (~33x slower than the internal SSD in local benchmarks), but this does not
+  affect the read-only workload we care about.
 
 Current acceptable baseline:
 
 - Full import completes locally from the 27 CSV files.
 - Exact city count and random lookup use the city index.
 - `Burlington` random lookup was observed around `158 ms` on a cold-ish cache.
+- Profiling should focus on read latency: random-read I/O, warm vs cold cache,
+  and end-to-end query timing (`EXPLAIN (ANALYZE, BUFFERS)`, `pgbench`).
 
 ## Constraints
 
