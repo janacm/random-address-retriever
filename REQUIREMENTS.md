@@ -28,9 +28,10 @@ The local implementation should return a real NAR address quickly, with enough m
     - city
     - province abbreviation
     - postal code
+11. Support `--verbose` output with source identifiers:
     - `loc_guid`
     - `addr_guid`
-11. Provide simple local scripts for database start, stop, import, and random lookup.
+12. Provide simple local scripts for database start, stop, import, and random lookup.
 
 ## Data Requirements
 

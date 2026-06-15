@@ -23,7 +23,13 @@ The scripts mount that APFS sparseimage at `/Volumes/random-address-postgres` be
 ./scripts/import-addresses.sh
 ./scripts/random-address.sh Burlington
 ./scripts/random-address.sh Burlington ON
+./scripts/random-address.sh --city Burlington --province ON
+./scripts/random-address.sh --city Burlington --province ON --verbose
 ```
+
+By default, `random-address.sh` prints the formatted address, city, province, and
+postal code. Use `--verbose` when you also need the source `loc_guid` and
+`addr_guid`.
 
 Connection:
 
