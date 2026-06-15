@@ -1,0 +1,15 @@
+._*
+.DS_Store
+
+# Local Postgres storage and runtime files.
+/.postgres/
+/logs/
+
+# Source and generated address data are large local artifacts.
+/Addresses/
+/ca/
+/Random Address Generator/
+
+# Temporary import scratch files.
+/tmp/
+*.log
