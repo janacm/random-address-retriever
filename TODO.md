@@ -2,19 +2,20 @@
 
 ## Hosting
 
-- [ ] Run the live backend from the MacBook first:
+- [x] Use the MacBook plus Cloudflare Tunnel path instead of NAS hosting.
+- [x] Keep the DS220j as support storage, not the primary live database host:
+  - nightly `pg_dump` backups
+  - raw NAR source file backup
+  - exported artifacts and logs
+- [x] Avoid hosting live Postgres on the DS220j:
+  - DS220j is memory constrained for this dataset
+  - Postgres should not use an SMB/NFS-mounted data directory
+  - Synology internal DSM PostgreSQL should not be used for app data
+- [ ] Run the live backend from the MacBook:
   - local Postgres on `127.0.0.1:55432`
   - small local HTTP API, not direct Postgres exposure
   - Cloudflare Tunnel in front of the API
   - Netlify Next.js server route calls the tunneled API with private credentials
-- [ ] Use the Synology DS220j as support storage, not the primary live database host:
-  - nightly `pg_dump` backups
-  - raw NAR source file backup
-  - exported artifacts and logs
-- [ ] Avoid hosting live Postgres on the DS220j unless expectations are very low:
-  - DS220j is memory constrained for this dataset
-  - Postgres should not use an SMB/NFS-mounted data directory
-  - Synology internal DSM PostgreSQL should not be used for app data
 - [ ] Revisit a dedicated always-on host if this needs production-like reliability:
   - Mac mini
   - small Linux mini PC
@@ -23,11 +24,13 @@
 
 ## Backend API
 
-- [ ] Build a narrow local HTTP API for random address lookup.
-- [ ] Require an API token for every request.
-- [ ] Validate city and province inputs.
-- [ ] Use parameterized SQL only.
-- [ ] Do not expose arbitrary SQL or direct database credentials.
+- [x] Build a narrow local HTTP API for random address lookup.
+- [x] Require an API token for every request.
+- [x] Validate city and province inputs.
+- [x] Use fixed SQL and safely quoted caller values.
+- [x] Do not expose arbitrary SQL or direct database credentials.
+- [x] Add Cloudflare Tunnel config template.
+- [x] Add Netlify/Next proxy route example.
 - [ ] Add basic rate limiting.
 
 ## Database Operations

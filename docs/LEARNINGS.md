@@ -87,8 +87,14 @@ postgresql://janac@127.0.0.1:55432/random_address_retriever
 
 ## Current Gaps
 
-- There is no web app or API yet.
+- The local API exists, but it has not yet been installed as a launch agent or paired with a running Cloudflare tunnel.
 - There are no automated tests yet.
 - Random selection is currently row-based, not location-based.
 - City matching is exact against `csd_eng_name`.
 - No geospatial queries are implemented yet.
+
+## Hosting Decision
+
+- The selected live path is MacBook-hosted Postgres plus a local HTTP API exposed through Cloudflare Tunnel.
+- The DS220j should be used for backups and source-data storage, not as the live database host.
+- Netlify should call the Cloudflare-protected API from a server-side Next.js route so Cloudflare Access credentials and API tokens never reach browser code.

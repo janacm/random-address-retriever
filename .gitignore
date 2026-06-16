@@ -1,9 +1,15 @@
 ._*
 .DS_Store
+.env
+.env.local
+.env.*.local
 
 # Local Postgres storage and runtime files.
 /.postgres/
 /logs/
+
+# Local Cloudflare tunnel config contains hostnames and credential paths.
+/cloudflare/tunnel/config.yml
 
 # Source and generated address data are large local artifacts.
 /Addresses/

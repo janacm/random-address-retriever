@@ -25,11 +25,17 @@ The scripts mount that APFS sparseimage at `/Volumes/random-address-postgres` be
 ./scripts/random-address.sh Burlington ON
 ./scripts/random-address.sh --city Burlington --province ON
 ./scripts/random-address.sh --city Burlington --province ON --verbose
+cp .env.example .env.local
+./scripts/api-start.sh
 ```
 
 By default, `random-address.sh` prints the formatted address, city, province, and
 postal code. Use `--verbose` when you also need the source `loc_guid` and
 `addr_guid`.
+
+The local API listens on `127.0.0.1:8787` and requires `ADDRESS_API_TOKEN`.
+Expose that API through Cloudflare Tunnel and Cloudflare Access; do not expose
+Postgres directly.
 
 Connection:
 
@@ -59,4 +65,5 @@ LIMIT 1;
 - [Data source decision](DATA_SOURCE_DECISION.md)
 - [Requirements](REQUIREMENTS.md)
 - [Findings and learnings](docs/LEARNINGS.md)
+- [Cloudflare Tunnel and Netlify setup](docs/CLOUDFLARE_NETLIFY.md)
 - [TODO](TODO.md)

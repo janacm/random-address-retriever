@@ -31,7 +31,9 @@ The local implementation should return a real NAR address quickly, with enough m
 11. Support `--verbose` output with source identifiers:
     - `loc_guid`
     - `addr_guid`
-12. Provide simple local scripts for database start, stop, import, and random lookup.
+12. Provide simple local scripts for database start, stop, import, random lookup, and API startup.
+13. Expose the MacBook-hosted backend through Cloudflare Tunnel rather than NAS hosting.
+14. Keep the DS220j as backup/support storage only.
 
 ## Data Requirements
 
@@ -92,6 +94,7 @@ Required scripts:
 - `scripts/db-stop.sh`
 - `scripts/import-addresses.sh`
 - `scripts/random-address.sh`
+- `scripts/api-start.sh`
 
 The local Postgres cluster must live inside:
 
@@ -104,6 +107,27 @@ The image mounts at:
 ```text
 /Volumes/random-address-postgres
 ```
+
+## API Requirements
+
+The local API must:
+
+- Bind to `127.0.0.1` by default.
+- Listen on port `8787` by default.
+- Require `ADDRESS_API_TOKEN` for every request.
+- Support `GET /healthz`.
+- Support `GET /random-address?city=Burlington&province=ON`.
+- Support optional `verbose=true` output with source identifiers.
+- Use fixed SQL with safely quoted caller values.
+- Never expose raw SQL or direct Postgres credentials.
+- Return JSON only.
+
+The Cloudflare/Netlify path must:
+
+- Expose only the local API through Cloudflare Tunnel.
+- Protect the tunnel hostname with Cloudflare Access Service Auth.
+- Store Cloudflare Access service-token credentials only in Netlify server-side environment variables.
+- Call the tunnel hostname only from a Netlify/Next server route, not browser code.
 
 ## Performance Requirements
 
@@ -138,11 +162,12 @@ Current acceptable baseline:
 - Postgres storage must therefore use the APFS sparseimage workaround unless the drive is reformatted.
 - Source datasets and generated database storage must not be committed to Git.
 - Current coordinates are `BG_X` and `BG_Y`; latitude/longitude are not part of the active CSV table.
+- The DS220j is not the selected live-hosting target for this database.
 
 ## Out Of Scope For Now
 
 - Web frontend.
-- REST or GraphQL API.
+- Public direct REST or GraphQL API.
 - Fuzzy city search.
 - Postal-code radius search.
 - PostGIS geospatial search.
