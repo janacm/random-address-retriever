@@ -4,6 +4,11 @@
 .env.local
 .env.*.local
 
+# JavaScript workspace dependencies and build output.
+/node_modules/
+/apps/*/node_modules/
+/apps/*/dist/
+
 # Local Postgres storage and runtime files.
 /.postgres/
 /logs/

@@ -8,10 +8,67 @@ Local National Address Register search/retrieval workspace.
 - Large source datasets, GeoJSON files, and local database storage are ignored by Git.
 - Postgres 16 is running locally on port `55432`.
 - The full NAR CSV dataset has been imported into `nar_addresses`.
+- A local HTTP API is available from `apps/api`.
+- A React frontend is available from `apps/web`.
 - Verified row count: `17,169,294`.
 - Verified Burlington rows:
   - `Burlington, ON`: `79,160`
   - `Burlington, NL`: `101`
+
+## Repo Layout
+
+```text
+apps/
+  api/        Local bearer-token HTTP API backed by Postgres
+  web/        Vite React frontend for random address retrieval
+docs/
+  reference/  NAR PDF/image reference files
+scripts/      Local database lifecycle and CLI lookup scripts
+sql/          Postgres schema for imported NAR CSV chunks
+```
+
+## Frontend and API
+
+Install dependencies once:
+
+```bash
+npm install
+```
+
+Start Postgres, then start the app:
+
+```bash
+./scripts/db-start.sh
+npm run dev
+```
+
+Open the frontend at:
+
+```text
+http://127.0.0.1:5173
+```
+
+The API listens at `http://127.0.0.1:8787`. In dev mode, the API and frontend
+default to the bearer token `local-dev-token`. Set `ADDRESS_API_TOKEN` and
+`VITE_ADDRESS_API_TOKEN` to the same value if you override it.
+
+For interactive latency, the API checks that a city/province match exists, then
+tries a small Postgres `TABLESAMPLE` lookup before falling back to the exact
+indexed `ORDER BY random()` query. The shell CLI keeps the exact query path.
+
+Example API call:
+
+```bash
+curl \
+  -H "Authorization: Bearer local-dev-token" \
+  "http://127.0.0.1:8787/api/random-address?city=Burlington&province=ON&verbose=true"
+```
+
+Production API start requires an explicit token:
+
+```bash
+ADDRESS_API_TOKEN="replace-me" npm run start -w @random-address/api
+```
 
 ## Database
 
@@ -66,4 +123,5 @@ LIMIT 1;
 - [Requirements](REQUIREMENTS.md)
 - [Findings and learnings](docs/LEARNINGS.md)
 - [Cloudflare Tunnel and Netlify setup](docs/CLOUDFLARE_NETLIFY.md)
+- [NAR reference files](docs/reference/)
 - [TODO](TODO.md)
