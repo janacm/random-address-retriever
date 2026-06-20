@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const verbose = requestUrl.searchParams.get("verbose") ?? "";
 
   const upstream = new URL(requiredEnv("ADDRESS_API_URL"));
-  upstream.pathname = "/random-address";
+  upstream.pathname = "/api/random-address";
   upstream.searchParams.set("city", city);
   if (province) {
     upstream.searchParams.set("province", province);

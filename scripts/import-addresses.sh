@@ -14,6 +14,9 @@ DROP INDEX IF EXISTS nar_addresses_city_province_idx;
 DROP INDEX IF EXISTS nar_addresses_postal_idx;
 DROP INDEX IF EXISTS nar_addresses_street_idx;
 DROP INDEX IF EXISTS nar_addresses_city_trgm_idx;
+-- Drop the large covering index (if a prior run of scripts/db-optimize.sh
+-- created it) so COPY does not maintain it row-by-row during the bulk load.
+DROP INDEX IF EXISTS nar_addresses_random_pick_idx;
 TRUNCATE nar_addresses;
 SQL
 
@@ -50,3 +53,5 @@ ANALYZE nar_addresses;
 
 SELECT count(*) AS imported_rows FROM nar_addresses;
 SQL
+
+echo "Import complete. Run ./scripts/db-optimize.sh to build the covering index for fast lookups."

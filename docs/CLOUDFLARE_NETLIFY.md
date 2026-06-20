@@ -38,9 +38,11 @@ ADDRESS_API_HOST=127.0.0.1
 ADDRESS_API_PORT=8787
 ```
 
-Start the local API:
+Build the covering index once (after a bulk import) so cold reads stay fast,
+then start the local API (builds and runs the Fastify service in `server/`):
 
 ```bash
+./scripts/db-optimize.sh
 ./scripts/api-start.sh
 ```
 

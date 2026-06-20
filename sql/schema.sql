@@ -36,6 +36,15 @@ CREATE INDEX IF NOT EXISTS nar_addresses_city_idx
 CREATE INDEX IF NOT EXISTS nar_addresses_city_province_idx
     ON nar_addresses (lower(csd_eng_name), mail_prov_abvn);
 
+-- The API's random-address pick is served by a covering index,
+-- nar_addresses_random_pick_idx, that INCLUDEs every returned column so the
+-- lookup is an index-only scan (Heap Fetches: 0). It is intentionally NOT
+-- created here: it is large (~2.7 GB), and keeping it out of the base schema
+-- means a fresh bulk import does not maintain it row-by-row during COPY
+-- (import-addresses.sh drops indexes before COPY and rebuilds afterward).
+-- Build it once after an import with scripts/db-optimize.sh, which also runs
+-- VACUUM ANALYZE to set the visibility map the index-only scan requires.
+
 CREATE INDEX IF NOT EXISTS nar_addresses_postal_idx
     ON nar_addresses (mail_postal_code);
 
