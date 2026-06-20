@@ -114,13 +114,16 @@ The local API must:
 
 - Bind to `127.0.0.1` by default.
 - Listen on port `8787` by default.
-- Require `ADDRESS_API_TOKEN` for every request.
+- Require `ADDRESS_API_TOKEN` for every request (constant-time comparison).
 - Support `GET /healthz`.
 - Support `GET /random-address?city=Burlington&province=ON`.
 - Support optional `verbose=true` output with source identifiers.
-- Use fixed SQL with safely quoted caller values.
+- Use parameterized SQL (`$1`, `$2`); never interpolate caller values.
 - Never expose raw SQL or direct Postgres credentials.
 - Return JSON only.
+
+The API is implemented in `server/` as a TypeScript [Fastify](https://fastify.dev)
+service using a pooled `pg` connection. See [server/README.md](server/README.md).
 
 The Cloudflare/Netlify path must:
 
@@ -164,6 +167,16 @@ Current acceptable baseline:
 - Current coordinates are `BG_X` and `BG_Y`; latitude/longitude are not part of the active CSV table.
 - The DS220j is not the selected live-hosting target for this database.
 
+## Tooling And Quality Requirements
+
+- The API is written in TypeScript with strict typing.
+- Inputs are validated at the edge (TypeBox schema → runtime + static types).
+- The HTTP layer is testable without a database (dependency-injected `Database`).
+- Unit tests run with no external services; integration tests run against a real
+  Postgres when `RUN_DB_TESTS=1`.
+- CI (GitHub Actions) runs typecheck, build, unit tests, and integration tests
+  against a seeded `postgres:16` service.
+
 ## Out Of Scope For Now
 
 - Web frontend.
@@ -173,7 +186,6 @@ Current acceptable baseline:
 - PostGIS geospatial search.
 - Normalized location/address tables.
 - Packaging for another machine.
-- Automated tests.
 
 ## Open Questions
 

@@ -33,9 +33,23 @@ By default, `random-address.sh` prints the formatted address, city, province, an
 postal code. Use `--verbose` when you also need the source `loc_guid` and
 `addr_guid`.
 
-The local API listens on `127.0.0.1:8787` and requires `ADDRESS_API_TOKEN`.
-Expose that API through Cloudflare Tunnel and Cloudflare Access; do not expose
-Postgres directly.
+## Local API
+
+The API is a strongly-typed [Fastify](https://fastify.dev) + TypeScript service
+in [`server/`](server/) that uses a pooled `pg` connection (see
+[server/README.md](server/README.md)). It listens on `127.0.0.1:8787` and
+requires `ADDRESS_API_TOKEN` on every request. Expose it through Cloudflare
+Tunnel and Cloudflare Access; never expose Postgres directly.
+
+```bash
+./scripts/db-optimize.sh   # one-time: build covering index + VACUUM ANALYZE
+./scripts/api-start.sh     # start Postgres + build & run the API
+./scripts/healthcheck.sh   # verify Postgres + API are up
+```
+
+A random pick is served by an index-only scan over a covering index (~20 ms
+warm; cold first request drops from ~16.8 s to a few hundred ms). Run
+`./scripts/db-optimize.sh` once after a bulk import.
 
 Connection:
 

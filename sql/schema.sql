@@ -36,6 +36,17 @@ CREATE INDEX IF NOT EXISTS nar_addresses_city_idx
 CREATE INDEX IF NOT EXISTS nar_addresses_city_province_idx
     ON nar_addresses (lower(csd_eng_name), mail_prov_abvn);
 
+-- Covering index for the API's random-address pick. Including every returned
+-- column lets Postgres satisfy the lookup with an index-only scan over the
+-- city's contiguous index pages (Heap Fetches: 0) instead of reading every
+-- matching heap row. Requires the visibility map to be set; run
+-- scripts/db-optimize.sh (VACUUM ANALYZE) after a bulk import.
+CREATE INDEX IF NOT EXISTS nar_addresses_random_pick_idx
+    ON nar_addresses (lower(csd_eng_name), mail_prov_abvn)
+    INCLUDE (apt_no_label, civic_no, civic_no_suffix,
+             official_street_name, official_street_type, official_street_dir,
+             csd_eng_name, mail_postal_code, loc_guid, addr_guid);
+
 CREATE INDEX IF NOT EXISTS nar_addresses_postal_idx
     ON nar_addresses (mail_postal_code);
 

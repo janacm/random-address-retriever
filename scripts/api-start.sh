@@ -15,4 +15,12 @@ fi
 
 "$ROOT_DIR/scripts/db-start.sh" >/dev/null
 
-exec node "$ROOT_DIR/server/random-address-api.mjs"
+cd "$ROOT_DIR/server"
+
+if [[ ! -d node_modules ]]; then
+  echo "Installing API dependencies..." >&2
+  npm ci
+fi
+
+npm run build
+exec node dist/index.js
