@@ -17,6 +17,15 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/scripts/db-env.sh"
 
+# Honor PG connection overrides from .env.local (as api-start.sh and
+# healthcheck.sh do) so this optimizes the same database the API uses.
+if [[ -f "$ROOT_DIR/.env.local" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "$ROOT_DIR/.env.local"
+  set +a
+fi
+
 "$ROOT_DIR/scripts/db-start.sh" >/dev/null
 
 echo "Creating covering index nar_addresses_random_pick_idx (if missing)..."

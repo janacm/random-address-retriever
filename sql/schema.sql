@@ -36,16 +36,14 @@ CREATE INDEX IF NOT EXISTS nar_addresses_city_idx
 CREATE INDEX IF NOT EXISTS nar_addresses_city_province_idx
     ON nar_addresses (lower(csd_eng_name), mail_prov_abvn);
 
--- Covering index for the API's random-address pick. Including every returned
--- column lets Postgres satisfy the lookup with an index-only scan over the
--- city's contiguous index pages (Heap Fetches: 0) instead of reading every
--- matching heap row. Requires the visibility map to be set; run
--- scripts/db-optimize.sh (VACUUM ANALYZE) after a bulk import.
-CREATE INDEX IF NOT EXISTS nar_addresses_random_pick_idx
-    ON nar_addresses (lower(csd_eng_name), mail_prov_abvn)
-    INCLUDE (apt_no_label, civic_no, civic_no_suffix,
-             official_street_name, official_street_type, official_street_dir,
-             csd_eng_name, mail_postal_code, loc_guid, addr_guid);
+-- The API's random-address pick is served by a covering index,
+-- nar_addresses_random_pick_idx, that INCLUDEs every returned column so the
+-- lookup is an index-only scan (Heap Fetches: 0). It is intentionally NOT
+-- created here: it is large (~2.7 GB), and keeping it out of the base schema
+-- means a fresh bulk import does not maintain it row-by-row during COPY
+-- (import-addresses.sh drops indexes before COPY and rebuilds afterward).
+-- Build it once after an import with scripts/db-optimize.sh, which also runs
+-- VACUUM ANALYZE to set the visibility map the index-only scan requires.
 
 CREATE INDEX IF NOT EXISTS nar_addresses_postal_idx
     ON nar_addresses (mail_postal_code);
