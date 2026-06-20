@@ -39,7 +39,7 @@ row when verbose/source mode is enabled.
 15. Validate city and province inputs before querying Postgres.
 16. Use parameterized SQL only.
 17. Provide a local browser frontend for city/province lookup.
-18. Keep JavaScript app code organized under `apps/api` and `apps/web`.
+18. Keep the API in `server/` (TypeScript) and the web frontend in `apps/web`.
 19. Expose the MacBook-hosted backend through Cloudflare Tunnel rather than NAS hosting.
 20. Keep the DS220j as backup/support storage only.
 
@@ -151,10 +151,10 @@ The local API must:
 - Never expose raw SQL or direct Postgres credentials.
 - Return JSON only.
 
-Two implementations currently coexist and should be consolidated: `apps/api`
-(JavaScript, used by `apps/web`) and `server/`, a strongly-typed
-[Fastify](https://fastify.dev) + TypeScript service with unit/integration tests
-and CI (see [server/README.md](server/README.md)).
+The API is implemented in `server/` as a strongly-typed
+[Fastify](https://fastify.dev) + TypeScript service with a pooled `pg`
+connection, unit/integration tests, and CI (see
+[server/README.md](server/README.md)). The web frontend in `apps/web` calls it.
 
 The Cloudflare/Netlify path must:
 

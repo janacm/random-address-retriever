@@ -7,35 +7,26 @@ import {
   Type,
 } from "@fastify/type-provider-typebox";
 import type { Config } from "./config";
-import type { AddressRecord, Database } from "./db";
+import type { Database } from "./db";
 import { makeAuthHook } from "./auth";
+import { ValidationError } from "./errors";
+import { makeCorsHook, makeRateLimitHook } from "./hooks";
+import { PROVINCES } from "./provinces";
+import { parseAddressQuery, toAddressPayload } from "./query";
 
 export interface AppDeps {
   db: Database;
   config: Config;
 }
 
-const VERBOSE_TRUE = new Set(["1", "true", "yes", "on"]);
-
 const RandomAddressQuerySchema = Type.Object({
-  city: Type.Optional(Type.String({ minLength: 1, maxLength: 100 })),
-  province: Type.Optional(
-    Type.String({ pattern: "^[A-Za-z]{2}$", description: "Postal province, e.g. ON" }),
-  ),
-  verbose: Type.Optional(Type.String({ maxLength: 8 })),
+  city: Type.Optional(Type.String()),
+  province: Type.Optional(Type.String()),
+  verbose: Type.Optional(Type.String()),
 });
 
-function shapeResponse(record: AddressRecord, verbose: boolean) {
-  const base = {
-    address: record.address,
-    city: record.city,
-    province: record.province,
-    postal_code: record.postal_code,
-  };
-  if (!verbose) {
-    return base;
-  }
-  return { ...base, loc_guid: record.loc_guid, addr_guid: record.addr_guid };
+function elapsedMs(startedAt: bigint): number {
+  return Math.round(Number(process.hrtime.bigint() - startedAt) / 1e6);
 }
 
 /**
@@ -49,49 +40,86 @@ export function buildApp({ db, config }: AppDeps): FastifyInstance {
     disableRequestLogging: !config.logger,
   }).withTypeProvider<TypeBoxTypeProvider>();
 
-  // Every request must carry the API token.
+  // Order matters: CORS answers preflight before auth can reject it; the rate
+  // limiter runs before auth so unauthenticated floods are still bounded.
+  app.addHook("onRequest", makeCorsHook(config.corsOrigins));
+  app.addHook("onRequest", makeRateLimitHook(config.rateLimit));
   app.addHook("onRequest", makeAuthHook(config.apiToken));
 
   app.setErrorHandler((error: FastifyError, _request, reply) => {
+    if (error instanceof ValidationError) {
+      void reply.code(400).send({
+        error: {
+          code: "bad_request",
+          message: error.message,
+          details: error.details,
+        },
+      });
+      return;
+    }
+    if (error.validation) {
+      void reply
+        .code(400)
+        .send({ error: { code: "bad_request", message: error.message } });
+      return;
+    }
     const status = error.statusCode ?? 500;
     if (status >= 500) {
       app.log.error(error);
-      void reply.code(500).send({ error: "internal_server_error" });
+      void reply.code(500).send({
+        error: { code: "internal_error", message: "Address lookup failed." },
+      });
       return;
     }
-    void reply.code(status).send({
-      error: error.validation ? "invalid_request" : "bad_request",
-      message: error.message,
-    });
+    void reply
+      .code(status)
+      .send({ error: { code: "bad_request", message: error.message } });
   });
 
   app.setNotFoundHandler((_request, reply) => {
-    void reply.code(404).send({ error: "not_found" });
+    void reply
+      .code(404)
+      .send({ error: { code: "not_found", message: "Route not found." } });
   });
 
   app.get("/healthz", async () => {
+    const startedAt = process.hrtime.bigint();
     const { database } = await db.ping();
-    return { ok: true, database };
+    return { data: { ok: true, database, durationMs: elapsedMs(startedAt) } };
   });
 
+  app.get("/api/provinces", async () => ({ data: PROVINCES }));
+
   app.get(
-    "/random-address",
+    "/api/random-address",
     { schema: { querystring: RandomAddressQuerySchema } },
     async (request, reply) => {
-      const { city = "Burlington", province, verbose } = request.query;
-
+      const query = parseAddressQuery(request.query);
+      const startedAt = process.hrtime.bigint();
       const record = await db.randomAddress({
-        city,
-        province: province ? province.toUpperCase() : undefined,
+        city: query.city,
+        province: query.province ?? undefined,
       });
 
       if (!record) {
-        return reply.code(404).send({ error: "not_found" });
+        return reply.code(404).send({
+          error: {
+            code: "not_found",
+            message: "No address matched that city and province.",
+          },
+          meta: { city: query.city, province: query.province },
+        });
       }
 
-      const isVerbose =
-        verbose !== undefined && VERBOSE_TRUE.has(verbose.toLowerCase());
-      return shapeResponse(record, isVerbose);
+      return {
+        data: toAddressPayload(record, query.verbose),
+        meta: {
+          city: query.city,
+          province: query.province,
+          verbose: query.verbose,
+          durationMs: elapsedMs(startedAt),
+        },
+      };
     },
   );
 

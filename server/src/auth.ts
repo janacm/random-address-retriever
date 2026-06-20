@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import type { FastifyReply, FastifyRequest, preHandlerHookHandler } from "fastify";
+import type { FastifyReply, FastifyRequest, onRequestHookHandler } from "fastify";
 
 /**
  * Hash both sides before comparing so `timingSafeEqual` always receives
@@ -29,13 +29,18 @@ export function extractToken(request: FastifyRequest): string {
 }
 
 /** Build an `onRequest` hook that rejects any request lacking the API token. */
-export function makeAuthHook(expectedToken: string): preHandlerHookHandler {
+export function makeAuthHook(expectedToken: string): onRequestHookHandler {
   return async function authHook(
     request: FastifyRequest,
     reply: FastifyReply,
   ): Promise<void> {
     if (!tokensMatch(extractToken(request), expectedToken)) {
-      await reply.code(401).send({ error: "unauthorized" });
+      await reply.code(401).send({
+        error: {
+          code: "unauthorized",
+          message: "A valid bearer token is required.",
+        },
+      });
     }
   };
 }

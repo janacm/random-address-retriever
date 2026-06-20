@@ -8,7 +8,7 @@ Local National Address Register search/retrieval workspace.
 - Large source datasets, GeoJSON files, and local database storage are ignored by Git.
 - Postgres 16 is running locally on port `55432`.
 - The full NAR CSV dataset has been imported into `nar_addresses`.
-- A local HTTP API is available from `apps/api`.
+- A local HTTP API is available from `server/` (Fastify + TypeScript).
 - A React frontend is available from `apps/web`.
 - Verified row count: `17,169,294`.
 - Verified Burlington rows:
@@ -18,8 +18,8 @@ Local National Address Register search/retrieval workspace.
 ## Repo Layout
 
 ```text
+server/       Fastify + TypeScript bearer-token HTTP API (see server/README.md)
 apps/
-  api/        Local bearer-token HTTP API backed by Postgres
   web/        Vite React frontend for random address retrieval
 docs/
   reference/  NAR PDF/image reference files
@@ -48,13 +48,16 @@ Open the frontend at:
 http://127.0.0.1:5173
 ```
 
-The API listens at `http://127.0.0.1:8787`. In dev mode, the API and frontend
-default to the bearer token `local-dev-token`. Set `ADDRESS_API_TOKEN` and
-`VITE_ADDRESS_API_TOKEN` to the same value if you override it.
+`npm install` also installs the API in `server/` (via a postinstall step), and
+`npm run dev` starts both the API and the frontend.
 
-For interactive latency, the API checks that a city/province match exists, then
-tries a small Postgres `TABLESAMPLE` lookup before falling back to the exact
-indexed `ORDER BY random()` query. The shell CLI keeps the exact query path.
+The API (`server/`) listens at `http://127.0.0.1:8787`. In dev mode, the API and
+frontend default to the bearer token `local-dev-token`. Set `ADDRESS_API_TOKEN`
+and `VITE_ADDRESS_API_TOKEN` to the same value if you override it.
+
+The random pick uses an index-only scan over a covering index (`Heap Fetches:
+0`), which keeps it fast and uniform without sampling (~20 ms warm). The shell
+CLI uses the same exact-query path. See [server/README.md](server/README.md).
 
 Example API call:
 
@@ -67,7 +70,7 @@ curl \
 Production API start requires an explicit token:
 
 ```bash
-ADDRESS_API_TOKEN="replace-me" npm run start -w @random-address/api
+ADDRESS_API_TOKEN="replace-me" NODE_ENV=production npm --prefix server start
 ```
 
 ## Database

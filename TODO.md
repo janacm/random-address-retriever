@@ -46,6 +46,7 @@
 - [x] Add integration tests against a real Postgres (gated by `RUN_DB_TESTS`).
 - [x] Add GitHub Actions CI (typecheck, build, unit + integration tests).
 - [x] Optimize cold read latency (covering index + VACUUM; `db-optimize.sh`).
+- [x] Consolidate to a single API in `server/` (Fastify TS); `apps/web` calls it.
 
 ## Database Operations
 

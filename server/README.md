@@ -2,9 +2,10 @@
 
 A small, strongly-typed HTTP API that returns a random Canadian address from
 the local NAR Postgres database. It is the only process that talks to Postgres;
-everything else (Cloudflare Tunnel, Cloudflare Access, the Netlify route) sits
-in front of it. See [docs/CLOUDFLARE_NETLIFY.md](../docs/CLOUDFLARE_NETLIFY.md)
-for the full edge architecture.
+the web frontend in [`apps/web`](../apps/web) and the edge path (Cloudflare
+Tunnel, Cloudflare Access, the Netlify route) sit in front of it. See
+[docs/CLOUDFLARE_NETLIFY.md](../docs/CLOUDFLARE_NETLIFY.md) for the full edge
+architecture.
 
 ## Stack
 
@@ -20,33 +21,41 @@ for the full edge architecture.
 ## Endpoints
 
 All requests require the API token via `Authorization: Bearer <token>` or
-`X-Api-Token: <token>`.
+`X-Api-Token: <token>`. Responses use a `{ data, meta }` / `{ error }` envelope
+(the shape [`apps/web`](../apps/web) consumes).
 
 | Method & path | Description |
 |---|---|
-| `GET /healthz` | Liveness + connected database name. |
-| `GET /random-address?city=&province=&verbose=` | Random address. `city` defaults to `Burlington`; `province` is an optional 2-letter code; `verbose=true` adds `loc_guid`/`addr_guid`. |
+| `GET /healthz` | `{ data: { ok, database, durationMs } }`. |
+| `GET /api/provinces` | `{ data: [{ code, name }, …] }`. |
+| `GET /api/random-address?city=&province=&verbose=` | Random address. `city` defaults to `Burlington`; `province` is an optional Canadian code; `verbose=true` nests `source: { locGuid, addrGuid }`. |
 
 ```bash
-curl -H "Authorization: Bearer $ADDRESS_API_TOKEN" \
-  "http://127.0.0.1:8787/random-address?city=Burlington&province=ON"
-# {"address":"586 Phoebe CRES","city":"Burlington","province":"ON","postal_code":"L7L6H7"}
+curl -H "Authorization: Bearer local-dev-token" \
+  "http://127.0.0.1:8787/api/random-address?city=Burlington&province=ON"
+# {"data":{"address":"586 Phoebe CRES","city":"Burlington","province":"ON","postalCode":"L7L6H7"},
+#  "meta":{"city":"Burlington","province":"ON","verbose":false,"durationMs":20}}
 ```
 
-Responses: `200` with the address, `400` invalid input, `401` missing/bad
-token, `404` no match, `500` internal error (never leaks details).
+Responses: `200` `{ data, meta }`; errors are `{ error: { code, message } }` —
+`400` invalid input (with `details`), `401` missing/bad token, `404` no match,
+`429` rate limited, `500` internal error (never leaks details). CORS reflects
+allow-listed origins and answers preflight `OPTIONS`.
 
 ## Configuration
 
-Loaded and validated at startup (`src/config.ts`); the process exits if
-`ADDRESS_API_TOKEN` is missing or any value is invalid.
+Loaded and validated at startup (`src/config.ts`); the process exits if any
+value is invalid.
 
 | Variable | Default | Notes |
 |---|---|---|
-| `ADDRESS_API_TOKEN` | — | **Required.** Bearer token for every request. |
+| `ADDRESS_API_TOKEN` | `local-dev-token` | Bearer token for every request. **Required when `NODE_ENV=production`.** |
 | `ADDRESS_API_HOST` | `127.0.0.1` | Bind address. Keep on localhost. |
 | `ADDRESS_API_PORT` | `8787` | |
 | `ADDRESS_API_LOG` | `true` | Set `false` to silence request logs. |
+| `ADDRESS_API_CORS_ORIGIN` | `http://127.0.0.1:5173,http://localhost:5173` | Comma-separated allow-list (`*` allows all). |
+| `ADDRESS_API_RATE_LIMIT_WINDOW_MS` | `60000` | Fixed window per client. |
+| `ADDRESS_API_RATE_LIMIT_MAX` | `120` | Max requests per window. |
 | `PGHOST` / `PGPORT` | `127.0.0.1` / `55432` | |
 | `PGDATABASE` | `random_address_retriever` | |
 | `PGUSER` / `PGPASSWORD` | current user / — | |
