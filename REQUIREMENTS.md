@@ -10,7 +10,9 @@ The first useful workflow is:
 give me a random address for Burlington
 ```
 
-The local implementation should return a real NAR address quickly, with enough metadata to inspect or trace the source row.
+The local implementation should return a real NAR address quickly through both a
+CLI and browser frontend, with enough metadata to inspect or trace the source
+row when verbose/source mode is enabled.
 
 ## Current Requirements
 
@@ -32,8 +34,14 @@ The local implementation should return a real NAR address quickly, with enough m
     - `loc_guid`
     - `addr_guid`
 12. Provide simple local scripts for database start, stop, import, random lookup, and API startup.
-13. Expose the MacBook-hosted backend through Cloudflare Tunnel rather than NAS hosting.
-14. Keep the DS220j as backup/support storage only.
+13. Provide a narrow local HTTP API for random address lookup.
+14. Require bearer-token authorization for API requests.
+15. Validate city and province inputs before querying Postgres.
+16. Use parameterized SQL only.
+17. Provide a local browser frontend for city/province lookup.
+18. Keep JavaScript app code organized under `apps/api` and `apps/web`.
+19. Expose the MacBook-hosted backend through Cloudflare Tunnel rather than NAS hosting.
+20. Keep the DS220j as backup/support storage only.
 
 ## Data Requirements
 
@@ -79,6 +87,10 @@ Current verified counts:
 - `Burlington, ON`: `79,160`
 - `Burlington, NL`: `101`
 
+The CLI uses the exact indexed city/province query with `ORDER BY random()`.
+The HTTP API uses an existence check plus sampled lookup first for interactive
+latency, and falls back to the exact query if sampling does not find a match.
+
 ## Operational Requirements
 
 Postgres connection:
@@ -95,6 +107,27 @@ Required scripts:
 - `scripts/import-addresses.sh`
 - `scripts/random-address.sh`
 - `scripts/api-start.sh`
+
+Node workspace commands:
+
+- `npm run dev` starts both the local API and web frontend.
+- `npm run build` builds all workspaces that define a build script.
+- `npm test` runs workspace tests.
+
+Local API:
+
+- `GET /healthz`
+- `GET /api/random-address?city=Burlington&province=ON&verbose=true`
+- `GET /api/provinces`
+- API host defaults to `127.0.0.1`.
+- API port defaults to `8787`.
+- Dev token defaults to `local-dev-token`.
+- `NODE_ENV=production` requires an explicit `ADDRESS_API_TOKEN`.
+
+Frontend:
+
+- Vite dev server defaults to `http://127.0.0.1:5173`.
+- The web app proxies `/api` and `/healthz` to the local API in development.
 
 The local Postgres cluster lives on the external APFS SSD at:
 
@@ -118,8 +151,10 @@ The local API must:
 - Never expose raw SQL or direct Postgres credentials.
 - Return JSON only.
 
-The API is implemented in `server/` as a TypeScript [Fastify](https://fastify.dev)
-service using a pooled `pg` connection. See [server/README.md](server/README.md).
+Two implementations currently coexist and should be consolidated: `apps/api`
+(JavaScript, used by `apps/web`) and `server/`, a strongly-typed
+[Fastify](https://fastify.dev) + TypeScript service with unit/integration tests
+and CI (see [server/README.md](server/README.md)).
 
 The Cloudflare/Netlify path must:
 
@@ -174,13 +209,16 @@ Current acceptable baseline:
 
 ## Out Of Scope For Now
 
-- Web frontend.
 - Public direct REST or GraphQL API.
+- Public hosting.
+- Cloudflare Tunnel automation.
+- Netlify server route deployment.
 - Fuzzy city search.
 - Postal-code radius search.
 - PostGIS geospatial search.
 - Normalized location/address tables.
 - Packaging for another machine.
+- End-to-end browser tests.
 
 ## Open Questions
 

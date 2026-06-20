@@ -27,11 +27,17 @@
 - [x] Build a narrow local HTTP API for random address lookup.
 - [x] Require an API token for every request.
 - [x] Validate city and province inputs.
-- [x] Use fixed SQL and safely quoted caller values.
+- [x] Use parameterized SQL only.
 - [x] Do not expose arbitrary SQL or direct database credentials.
 - [x] Add Cloudflare Tunnel config template.
 - [x] Add Netlify/Next proxy route example.
-- [ ] Add basic rate limiting.
+- [x] Add basic rate limiting.
+
+## Frontend
+
+- [x] Build a local browser interface for city/province random address lookup.
+- [x] Keep source GUIDs hidden unless the source identifiers toggle is enabled.
+- [ ] Add end-to-end browser coverage once the API and database are stable.
 
 ## Backend Quality
 

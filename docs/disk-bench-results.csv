@@ -1,0 +1,3 @@
+target,seq_write_med_mbps,seq_write_max_mbps,seq_read_med_mbps,seq_read_max_mbps,rand_read_iops,rand_read_lat_ms
+internal,6573.7,6804.5,5261.7,5416.7,12542,0.0797
+FATRIOT,39.3,39.3,37.3,37.3,26,38.2184
