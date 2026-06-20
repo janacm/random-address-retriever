@@ -4,24 +4,11 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT_DIR/scripts/db-env.sh"
 
-mkdir -p "$ROOT_DIR/.postgres"
-
-if [[ ! -e "$PG_IMAGE" ]]; then
-  hdiutil create \
-    -size "$PG_IMAGE_SIZE" \
-    -type SPARSE \
-    -fs APFS \
-    -volname random-address-postgres \
-    "$PG_IMAGE"
-fi
-
-if mount | awk '{print $3}' | grep -Fxq "$PG_MOUNT"; then
-  exit 0
-fi
-
-hdiutil attach "$PG_IMAGE" -nobrowse
-
+# The Postgres data directory lives on the external APFS SSD mounted at
+# $PG_MOUNT. It is a normal removable volume, so just verify it is attached
+# (no sparseimage to create or hdiutil-attach).
 if ! mount | awk '{print $3}' | grep -Fxq "$PG_MOUNT"; then
-  echo "Expected disk image to mount at $PG_MOUNT" >&2
+  echo "Expected the Postgres drive to be mounted at $PG_MOUNT." >&2
+  echo "Plug in the drive, or set PG_MOUNT/PGDATA, and try again." >&2
   exit 1
 fi

@@ -17,8 +17,8 @@ The local implementation should return a real NAR address quickly, with enough m
 1. Store and query the NAR CSV data locally.
 2. Use the `Addresses/Address_*.csv` files as the canonical import source.
 3. Run Postgres locally without requiring Docker.
-4. Keep Postgres storage on the Samsung T5 external SSD.
-5. Avoid storing Postgres directly on the ExFAT filesystem.
+4. Keep Postgres storage on the external SSD (`FATRIOT`, APFS).
+5. Store the Postgres cluster directly on the APFS SSD (no sparseimage needed).
 6. Keep large datasets and database files out of Git.
 7. Import all available NAR CSV chunks into one queryable table.
 8. Support random address lookup by exact city name.
@@ -96,17 +96,13 @@ Required scripts:
 - `scripts/random-address.sh`
 - `scripts/api-start.sh`
 
-The local Postgres cluster must live inside:
+The local Postgres cluster lives on the external APFS SSD at:
 
 ```text
-.postgres/random-address-postgres.sparseimage
+/Volumes/FATRIOT/postgres/data
 ```
 
-The image mounts at:
-
-```text
-/Volumes/random-address-postgres
-```
+Override `PG_MOUNT`/`PGDATA` (for example in `.env.local`) to relocate it.
 
 ## API Requirements
 
@@ -146,7 +142,7 @@ Write performance is explicitly out of scope:
   not optimization targets.
 - This is acceptable because `nar_addresses` is `UNLOGGED`, the table is loaded
   once and then queried, and the source CSVs are retained so it can be rebuilt.
-- The ExFAT/sparseimage storage stack has a large `fsync`/write penalty
+- The earlier ExFAT/sparseimage storage stack had a large `fsync`/write penalty
   (~33x slower than the internal SSD in local benchmarks), but this does not
   affect the read-only workload we care about.
 
@@ -160,9 +156,8 @@ Current acceptable baseline:
 
 ## Constraints
 
-- The Samsung T5 is currently formatted as ExFAT.
-- Direct Postgres initialization on ExFAT failed because macOS created `._*` AppleDouble files inside Postgres internals.
-- Postgres storage must therefore use the APFS sparseimage workaround unless the drive is reformatted.
+- Postgres storage uses the external APFS SSD `FATRIOT`, so the cluster is stored directly with no sparseimage workaround.
+- Historical: an earlier ExFAT drive (Samsung T5) required an APFS sparseimage because macOS created `._*` AppleDouble files inside the Postgres data directory (see docs/LEARNINGS.md).
 - Source datasets and generated database storage must not be committed to Git.
 - Current coordinates are `BG_X` and `BG_Y`; latitude/longitude are not part of the active CSV table.
 - The DS220j is not the selected live-hosting target for this database.

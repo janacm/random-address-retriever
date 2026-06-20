@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PG_BIN="/opt/homebrew/opt/postgresql@16/bin"
 
-export PG_IMAGE="${PG_IMAGE:-$ROOT_DIR/.postgres/random-address-postgres.sparseimage}"
-export PG_IMAGE_SIZE="${PG_IMAGE_SIZE:-80g}"
-export PG_MOUNT="${PG_MOUNT:-/Volumes/random-address-postgres}"
-export PGDATA="${PGDATA:-$PG_MOUNT/data}"
+# Postgres data lives on the external APFS SSD "FATRIOT". It is a normal
+# removable volume (APFS, not ExFAT), so no sparseimage workaround is needed.
+export PG_MOUNT="${PG_MOUNT:-/Volumes/FATRIOT}"
+export PGDATA="${PGDATA:-$PG_MOUNT/postgres/data}"
 export PGHOST="${PGHOST:-127.0.0.1}"
 export PGPORT="${PGPORT:-55432}"
 export PGDATABASE="${PGDATABASE:-random_address_retriever}"

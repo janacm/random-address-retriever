@@ -15,8 +15,11 @@ Local National Address Register search/retrieval workspace.
 
 ## Database
 
-Postgres data lives on the Samsung T5 inside this repo at `.postgres/random-address-postgres.sparseimage`.
-The scripts mount that APFS sparseimage at `/Volumes/random-address-postgres` before starting Postgres.
+Postgres data lives on the external APFS SSD `FATRIOT` at
+`/Volumes/FATRIOT/postgres/data`. Because that drive is APFS (not ExFAT), the
+old sparseimage workaround is no longer needed; the scripts just verify the
+drive is mounted before starting Postgres. Override `PG_MOUNT`/`PGDATA` (e.g. in
+`.env.local`) if your data lives elsewhere.
 
 ```bash
 ./scripts/db-init.sh
@@ -57,11 +60,11 @@ Connection:
 postgresql://janac@127.0.0.1:55432/random_address_retriever
 ```
 
-Storage after import:
+Storage after import (on the FATRIOT APFS SSD):
 
 - Postgres logical database size: about `5.3 GB`
-- Mounted data directory: about `6.3 GB`
-- Sparseimage file on the Samsung T5: about `8.6 GB`
+- Data directory (`/Volumes/FATRIOT/postgres/data`): about `6.3 GB`
+- Covering index for fast lookups (`scripts/db-optimize.sh`): about `2.7 GB`
 
 Useful query:
 

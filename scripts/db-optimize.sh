@@ -5,8 +5,8 @@ set -euo pipefail
 #
 # 1. Creates a covering index so a random-address pick is satisfied entirely
 #    from the index (Heap Fetches: 0) instead of reading every matching heap
-#    row. On the slow external-SSD sparseimage this turns a cold ~16.8 s pick
-#    into a few hundred ms at worst (~20 ms warm).
+#    row. On the slow external USB SSD this turns a cold ~16.8 s pick into a
+#    few hundred ms at worst (~20 ms warm).
 # 2. VACUUM (VERBOSE, ANALYZE) sets the visibility map so index-only scans are
 #    usable and refreshes planner stats.
 #
