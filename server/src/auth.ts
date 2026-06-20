@@ -1,18 +1,21 @@
-import { createHash, timingSafeEqual } from "node:crypto";
+import { timingSafeEqual } from "node:crypto";
 import type { FastifyReply, FastifyRequest, onRequestHookHandler } from "fastify";
 
 /**
- * Hash both sides before comparing so `timingSafeEqual` always receives
- * equal-length buffers (it throws otherwise) and the comparison time does not
- * leak the token's length.
+ * Constant-time comparison of the API token. The token is a single
+ * high-entropy secret of fixed length, so the early length check (the only
+ * timing signal here) reveals nothing useful, and the byte comparison runs in
+ * constant time via `timingSafeEqual`. We deliberately do not pre-hash the
+ * token: a fast digest adds no security for an equality check and would be a
+ * misuse of a hash function for secret comparison.
  */
-function sha256(value: string): Buffer {
-  return createHash("sha256").update(value, "utf8").digest();
-}
-
-/** Constant-time token comparison. */
 export function tokensMatch(actual: string, expected: string): boolean {
-  return timingSafeEqual(sha256(actual), sha256(expected));
+  const actualBuffer = Buffer.from(actual, "utf8");
+  const expectedBuffer = Buffer.from(expected, "utf8");
+  if (actualBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+  return timingSafeEqual(actualBuffer, expectedBuffer);
 }
 
 /** Extract the caller's token from `Authorization: Bearer` or `X-Api-Token`. */
