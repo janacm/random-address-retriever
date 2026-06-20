@@ -13,13 +13,29 @@ if [[ ! -d "$PGDATA/base" ]]; then
   initdb -D "$PGDATA" --encoding=UTF8 --locale=C >/dev/null
 fi
 
-# 2. Server (tuned a bit for a bulk load + single-user benchmark box)
+# 2. Server. Only the runtime connection params (port/socket) are passed as
+#    -o flags; the single-user benchmark tuning is persisted with ALTER SYSTEM
+#    below (into postgresql.auto.conf) so a plain `pg_ctl ... start` keeps it
+#    instead of silently reverting to defaults like work_mem=4MB.
+start_pg(){ pg_ctl -D "$PGDATA" -l "$PG_LOGDIR/postgres.log" -o "-p $PGPORT -k /tmp" start; }
+
 if ! pg_ctl -D "$PGDATA" status >/dev/null 2>&1; then
   echo ">> starting postgres on $PGPORT"
-  pg_ctl -D "$PGDATA" -l "$PG_LOGDIR/postgres.log" \
-    -o "-p $PGPORT -k /tmp -c shared_buffers=2GB -c work_mem=256MB -c maintenance_work_mem=1GB -c max_wal_size=8GB" \
-    start
+  start_pg
 fi
+
+echo ">> persisting tuning via ALTER SYSTEM (postgresql.auto.conf)"
+psql -h "$PGHOST" -p "$PGPORT" -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+ALTER SYSTEM SET shared_buffers = '2GB';
+ALTER SYSTEM SET work_mem = '256MB';
+ALTER SYSTEM SET maintenance_work_mem = '1GB';
+ALTER SYSTEM SET max_wal_size = '8GB';
+SQL
+# shared_buffers only takes effect after a restart, so restart now; subsequent
+# bare restarts read these values from postgresql.auto.conf automatically.
+echo ">> restarting postgres to apply persisted tuning"
+pg_ctl -D "$PGDATA" stop -m fast >/dev/null 2>&1 || true
+start_pg
 
 # 3. Database + schema
 if ! psql -h "$PGHOST" -p "$PGPORT" -d postgres -Atqc \

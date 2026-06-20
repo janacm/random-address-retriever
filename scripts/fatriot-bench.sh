@@ -6,13 +6,23 @@
 # excluded and only query planning+execution is measured.
 #
 # Usage: scripts/fatriot-bench.sh [RUNS]   (default 7)
-set -uo pipefail
+set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
 source "$ROOT_DIR/scripts/fatriot-env.sh"
 DUCKDB_BIN="${DUCKDB_BIN:-/opt/homebrew/bin/duckdb}"
 RUNS="${1:-7}"
 RESULTS="${RESULTS:-$FATRIOT/bench-results.csv}"
+
+# ---- preflight: both engines must be usable, or we'd write an all-blank CSV ----
+command -v psql >/dev/null 2>&1 || { echo "FATAL: psql not found on PATH" >&2; exit 1; }
+{ [[ -x "$DUCKDB_BIN" ]] || command -v "$DUCKDB_BIN" >/dev/null 2>&1; } \
+  || { echo "FATAL: duckdb not found at '$DUCKDB_BIN'" >&2; exit 1; }
+psql -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -Atqc 'SELECT 1 FROM nar_addresses LIMIT 1' >/dev/null 2>&1 \
+  || { echo "FATAL: Postgres unreachable or nar_addresses missing at $PGHOST:$PGPORT/$PGDATABASE" >&2; exit 1; }
+[[ -f "$DUCKDB_FILE" ]] || { echo "FATAL: DuckDB file missing: $DUCKDB_FILE" >&2; exit 1; }
+"$DUCKDB_BIN" "$DUCKDB_FILE" -batch -noheader -c 'SELECT 1 FROM nar_addresses LIMIT 1' >/dev/null 2>&1 \
+  || { echo "FATAL: DuckDB not queryable: $DUCKDB_FILE" >&2; exit 1; }
 
 # ---- workload: name | description | SQL (identical text for both engines) ----
 NAMES=(); DESCS=(); SQLS=()
@@ -31,7 +41,7 @@ add point_by_guid      "point lookup by PK guid"          "SELECT civic_no, offi
 
 # ---- timing helpers: echo a single float in milliseconds ----
 time_pg(){
-  psql -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -q -At -P pager=off \
+  psql -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -q -At -P pager=off -v ON_ERROR_STOP=1 \
        -c '\timing on' -c "$1" 2>/dev/null | awk '/^Time:/{t=$2} END{print t}'
 }
 time_duck(){
@@ -51,8 +61,14 @@ printf '%s\n' "-----------------------------------------------------------------
 for i in "${!NAMES[@]}"; do
   q="${SQLS[$i]}"; name="${NAMES[$i]}"
   pg=(); dk=()
-  for ((r=1;r<=RUNS;r++)); do pg+=("$(time_pg "$q")"); done
-  for ((r=1;r<=RUNS;r++)); do dk+=("$(time_duck "$q")"); done
+  for ((r=1;r<=RUNS;r++)); do
+    v=$(time_pg "$q"); [[ -n "$v" ]] || { echo "FATAL: no Postgres timing for '$name' (query failed?)" >&2; exit 1; }
+    pg+=("$v")
+  done
+  for ((r=1;r<=RUNS;r++)); do
+    v=$(time_duck "$q"); [[ -n "$v" ]] || { echo "FATAL: no DuckDB timing for '$name' (query failed?)" >&2; exit 1; }
+    dk+=("$v")
+  done
   pg_cold="${pg[0]}"; dk_cold="${dk[0]}"
   pg_warm=$(printf '%s\n' "${pg[@]:1}" | median); pg_min=$(printf '%s\n' "${pg[@]:1}" | minv)
   dk_warm=$(printf '%s\n' "${dk[@]:1}" | median); dk_min=$(printf '%s\n' "${dk[@]:1}" | minv)
