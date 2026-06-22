@@ -65,5 +65,6 @@ LIMIT 1;
 - [Data source decision](DATA_SOURCE_DECISION.md)
 - [Requirements](REQUIREMENTS.md)
 - [Findings and learnings](docs/LEARNINGS.md)
+- [FATRIOT link speed & cabling](docs/FATRIOT-LINK-AND-CABLING.md)
 - [Cloudflare Tunnel and Netlify setup](docs/CLOUDFLARE_NETLIFY.md)
 - [TODO](TODO.md)
