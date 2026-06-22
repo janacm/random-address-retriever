@@ -15,12 +15,14 @@ Local National Address Register search/retrieval workspace.
 
 ## Database
 
-Postgres data lives on the Samsung T5 inside this repo at `.postgres/random-address-postgres.sparseimage`.
-The scripts mount that APFS sparseimage at `/Volumes/random-address-postgres` before starting Postgres.
+Postgres data lives directly on the external **FATRIOT** APFS SSD at
+`/Volumes/FATRIOT/postgres/data`. Connect the drive, then manage the cluster with
+`scripts/fatriot-pg.sh` (see [FATRIOT setup](docs/FATRIOT-SETUP.md) and
+[link & cabling](docs/FATRIOT-LINK-AND-CABLING.md)).
 
 ```bash
-./scripts/db-init.sh
-./scripts/import-addresses.sh
+./scripts/fatriot-pg-setup.sh                 # one-time: initdb, schema, bulk load, indexes
+./scripts/fatriot-pg.sh start                 # start cluster (also: stop | restart | status)
 ./scripts/random-address.sh Burlington
 ./scripts/random-address.sh Burlington ON
 ./scripts/random-address.sh --city Burlington --province ON
@@ -46,8 +48,7 @@ postgresql://janac@127.0.0.1:55432/random_address_retriever
 Storage after import:
 
 - Postgres logical database size: about `5.3 GB`
-- Mounted data directory: about `6.3 GB`
-- Sparseimage file on the Samsung T5: about `8.6 GB`
+- Data directory on the FATRIOT SSD (`/Volumes/FATRIOT/postgres/data`): about `6.3 GB`
 
 Useful query:
 
