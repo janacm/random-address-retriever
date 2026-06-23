@@ -14,11 +14,9 @@
 #   CF_ACCESS_CLIENT_SECRET
 
 [build]
-  # This branch does not commit a pnpm lockfile, so bootstrap pnpm via corepack-
-  # free global install and let pnpm resolve from package.json (CI defaults to
-  # frozen, hence --no-frozen-lockfile). When the pnpm migration (committing
-  # pnpm-lock.yaml) lands, switch this to `pnpm install --frozen-lockfile`.
-  command = "npm install -g pnpm@9.14.4 && pnpm install --no-frozen-lockfile && pnpm --filter @random-address/web build"
+  # The repo now commits pnpm-lock.yaml (v9, pnpm 9.14.4). Use corepack to install
+  # pnpm and install from the lockfile for reproducible CI builds.
+  command = "corepack enable && corepack prepare pnpm@9.14.4 --activate && pnpm install --frozen-lockfile && pnpm --filter @random-address/web build"
   publish = "apps/web/dist"
 
 [build.environment]
