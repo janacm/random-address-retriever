@@ -11,6 +11,9 @@ node_modules/
 /server/dist/
 *.tsbuildinfo
 
+# Netlify CLI link state (site ID, etc.).
+.netlify/
+
 # Local Postgres storage and runtime files.
 /.postgres/
 /logs/
