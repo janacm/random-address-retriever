@@ -1,4 +1,11 @@
-import type { HealthResponse, RandomAddressQuery, RandomAddressResponse } from "./types";
+import type {
+  CitiesResponse,
+  CitySuggestion,
+  HealthResponse,
+  ProvinceCode,
+  RandomAddressQuery,
+  RandomAddressResponse,
+} from "./types";
 
 // Dev-only bearer token. In production, the Netlify Edge Function proxy injects
 // the real token server-side, so it is never sent (or bundled) for prod builds.
@@ -63,6 +70,26 @@ export async function fetchRandomAddress(query: RandomAddressQuery) {
   });
 
   return readJson<RandomAddressResponse>(response);
+}
+
+export async function fetchCities(
+  q: string,
+  province: ProvinceCode | "",
+  signal?: AbortSignal
+): Promise<CitySuggestion[]> {
+  const params = new URLSearchParams({ q });
+
+  if (province) {
+    params.set("province", province);
+  }
+
+  const response = await fetch(`/api/cities?${params}`, {
+    headers: authHeaders(),
+    signal,
+  });
+
+  const body = await readJson<CitiesResponse>(response);
+  return body.data;
 }
 
 export async function checkHealth() {

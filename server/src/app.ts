@@ -12,7 +12,7 @@ import { makeAuthHook } from "./auth";
 import { ValidationError } from "./errors";
 import { makeCorsHook, makeRateLimitHook } from "./hooks";
 import { PROVINCES } from "./provinces";
-import { parseAddressQuery, toAddressPayload } from "./query";
+import { parseAddressQuery, parseCitiesQuery, toAddressPayload } from "./query";
 
 export interface AppDeps {
   db: Database;
@@ -23,6 +23,12 @@ const RandomAddressQuerySchema = Type.Object({
   city: Type.Optional(Type.String()),
   province: Type.Optional(Type.String()),
   verbose: Type.Optional(Type.String()),
+});
+
+const CitiesQuerySchema = Type.Object({
+  q: Type.Optional(Type.String()),
+  province: Type.Optional(Type.String()),
+  limit: Type.Optional(Type.String()),
 });
 
 function elapsedMs(startedAt: bigint): number {
@@ -89,6 +95,30 @@ export function buildApp({ db, config }: AppDeps): FastifyInstance {
   });
 
   app.get("/api/provinces", async () => ({ data: PROVINCES }));
+
+  app.get(
+    "/api/cities",
+    { schema: { querystring: CitiesQuerySchema } },
+    async (request) => {
+      const query = parseCitiesQuery(request.query);
+      const startedAt = process.hrtime.bigint();
+      const cities = await db.listCities({
+        q: query.q,
+        province: query.province ?? undefined,
+        limit: query.limit,
+      });
+
+      return {
+        data: cities,
+        meta: {
+          q: query.q,
+          province: query.province,
+          count: cities.length,
+          durationMs: elapsedMs(startedAt),
+        },
+      };
+    },
+  );
 
   app.get(
     "/api/random-address",

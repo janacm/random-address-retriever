@@ -50,6 +50,52 @@ export function parseAddressQuery(params: RawAddressQuery): ParsedAddressQuery {
   };
 }
 
+export const MAX_CITY_RESULTS = 20;
+
+export interface ParsedCitiesQuery {
+  q: string;
+  province: string | null;
+  limit: number;
+}
+
+export interface RawCitiesQuery {
+  q?: string | undefined;
+  province?: string | undefined;
+  limit?: string | undefined;
+}
+
+/** Validate and normalize the city typeahead query string. */
+export function parseCitiesQuery(params: RawCitiesQuery): ParsedCitiesQuery {
+  const q = (params.q ?? "").trim();
+
+  if (q.length < 2) {
+    throw new ValidationError("Search term must be at least 2 characters.", {
+      field: "q",
+    });
+  }
+  if (q.length > 100) {
+    throw new ValidationError("Search term must be 100 characters or fewer.", {
+      field: "q",
+    });
+  }
+
+  const province = (params.province ?? "").trim().toUpperCase();
+  if (province && !PROVINCE_CODES.has(province)) {
+    throw new ValidationError(
+      "Province must be a Canadian postal abbreviation.",
+      { field: "province", allowedValues: [...PROVINCE_CODES] },
+    );
+  }
+
+  const parsedLimit = Number.parseInt(params.limit ?? "", 10);
+  const limit =
+    Number.isFinite(parsedLimit) && parsedLimit > 0
+      ? Math.min(parsedLimit, MAX_CITY_RESULTS)
+      : MAX_CITY_RESULTS;
+
+  return { q, province: province || null, limit };
+}
+
 export interface AddressPayload {
   address: string | null;
   city: string | null;

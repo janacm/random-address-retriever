@@ -2,7 +2,12 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { buildApp } from "../src/app";
 import type { Config } from "../src/config";
-import type { AddressRecord, Database, RandomAddressQuery } from "../src/db";
+import type {
+  AddressRecord,
+  Database,
+  ListCitiesQuery,
+  RandomAddressQuery,
+} from "../src/db";
 
 const config: Config = {
   host: "127.0.0.1",
@@ -34,6 +39,7 @@ const sample: AddressRecord = {
 function fakeDb(overrides: Partial<Database> = {}): Database {
   return {
     randomAddress: async () => sample,
+    listCities: async () => [],
     ping: async () => ({ database: "test_db" }),
     close: async () => {},
     ...overrides,
@@ -186,6 +192,50 @@ describe("GET /api/provinces", () => {
     expect(Array.isArray(body.data)).toBe(true);
     expect(body.data).toContainEqual({ code: "ON", name: "Ontario" });
     expect(body.data).toHaveLength(13);
+  });
+});
+
+describe("GET /api/cities", () => {
+  it("returns matching cities and passes the parsed query to the db", async () => {
+    let received: ListCitiesQuery | undefined;
+    app = buildApp({
+      db: fakeDb({
+        listCities: async (query) => {
+          received = query;
+          return [{ city: "Burlington", province: "ON", addressCount: 42 }];
+        },
+      }),
+      config,
+    });
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/cities?q=bur&province=on",
+      headers: authHeader,
+    });
+    expect(res.statusCode).toBe(200);
+    expect(received).toEqual({ q: "bur", province: "ON", limit: 20 });
+    const body = res.json();
+    expect(body.data).toEqual([
+      { city: "Burlington", province: "ON", addressCount: 42 },
+    ]);
+    expect(body.meta).toMatchObject({ q: "bur", province: "ON", count: 1 });
+  });
+
+  it("rejects a search term shorter than 2 characters", async () => {
+    app = buildApp({ db: fakeDb(), config });
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/cities?q=b",
+      headers: authHeader,
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error.details.field).toBe("q");
+  });
+
+  it("requires the token", async () => {
+    app = buildApp({ db: fakeDb(), config });
+    const res = await app.inject({ method: "GET", url: "/api/cities?q=burl" });
+    expect(res.statusCode).toBe(401);
   });
 });
 

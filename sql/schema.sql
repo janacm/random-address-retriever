@@ -55,3 +55,28 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE INDEX IF NOT EXISTS nar_addresses_city_trgm_idx
     ON nar_addresses USING gin (csd_eng_name gin_trgm_ops);
+
+-- Typeahead source for the city search box. Holds one row per distinct
+-- CSD/province pair (a few thousand rows) with its address count, so fuzzy
+-- lookups answer instantly via the trigram index below instead of scanning the
+-- 17M-row base table with a DISTINCT. Created WITH NO DATA so a fresh schema
+-- load stays cheap; populate (and keep it current after each import) with:
+--     REFRESH MATERIALIZED VIEW nar_cities;
+-- The unique index lets you later switch to REFRESH ... CONCURRENTLY.
+CREATE MATERIALIZED VIEW IF NOT EXISTS nar_cities AS
+    SELECT csd_eng_name AS city,
+           mail_prov_abvn AS province,
+           count(*) AS address_count
+    FROM nar_addresses
+    WHERE csd_eng_name IS NOT NULL AND csd_eng_name <> ''
+    GROUP BY csd_eng_name, mail_prov_abvn
+WITH NO DATA;
+
+CREATE UNIQUE INDEX IF NOT EXISTS nar_cities_city_prov_idx
+    ON nar_cities (city, province);
+
+CREATE INDEX IF NOT EXISTS nar_cities_city_trgm_idx
+    ON nar_cities USING gin (city gin_trgm_ops);
+
+CREATE INDEX IF NOT EXISTS nar_cities_city_lower_idx
+    ON nar_cities (lower(city));
