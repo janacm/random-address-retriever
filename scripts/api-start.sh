@@ -15,12 +15,12 @@ fi
 
 "$ROOT_DIR/scripts/db-start.sh" >/dev/null
 
-cd "$ROOT_DIR/server"
+cd "$ROOT_DIR"
 
-if [[ ! -d node_modules ]]; then
-  echo "Installing API dependencies..." >&2
-  npm ci
+if [[ ! -d server/node_modules ]]; then
+  echo "Installing workspace dependencies..." >&2
+  pnpm install --frozen-lockfile
 fi
 
-npm run build
-exec node dist/index.js
+pnpm --filter random-address-api run build
+exec pnpm --filter random-address-api start

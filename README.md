@@ -32,14 +32,14 @@ sql/          Postgres schema for imported NAR CSV chunks
 Install dependencies once:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Start Postgres, then start the app:
 
 ```bash
 ./scripts/db-start.sh
-npm run dev
+pnpm dev
 ```
 
 Open the frontend at:
@@ -48,8 +48,8 @@ Open the frontend at:
 http://127.0.0.1:5173
 ```
 
-`npm install` also installs the API in `server/` (via a postinstall step), and
-`npm run dev` starts both the API and the frontend.
+`pnpm install` installs all workspace packages (the API in `server/` and the web
+app in `apps/web/`), and `pnpm dev` starts both the API and the frontend.
 
 The API (`server/`) listens at `http://127.0.0.1:8787`. In dev mode, the API and
 frontend default to the bearer token `local-dev-token`. Set `ADDRESS_API_TOKEN`
@@ -70,20 +70,23 @@ curl \
 Production API start requires an explicit token:
 
 ```bash
-ADDRESS_API_TOKEN="replace-me" NODE_ENV=production npm --prefix server start
+ADDRESS_API_TOKEN="replace-me" NODE_ENV=production pnpm --filter random-address-api start
 ```
 
 ## Database
 
-Postgres data lives on the external APFS SSD `FATRIOT` at
-`/Volumes/FATRIOT/postgres/data`. Because that drive is APFS (not ExFAT), the
-old sparseimage workaround is no longer needed; the scripts just verify the
-drive is mounted before starting Postgres. Override `PG_MOUNT`/`PGDATA` (e.g. in
-`.env.local`) if your data lives elsewhere.
+Postgres data lives directly on the external **FATRIOT** APFS SSD at
+`/Volumes/FATRIOT/postgres/data`. Because that drive is APFS (not ExFAT), the old
+sparseimage workaround is gone; the scripts just verify the drive is mounted
+before starting Postgres. Override `PG_MOUNT`/`PGDATA` (e.g. in `.env.local`) if
+your data lives elsewhere. See [FATRIOT setup](docs/FATRIOT-SETUP.md) and
+[link & cabling](docs/FATRIOT-LINK-AND-CABLING.md).
 
 ```bash
-./scripts/db-init.sh
-./scripts/import-addresses.sh
+./scripts/db-init.sh                          # one-time: initdb + schema (creates the cluster)
+./scripts/import-addresses.sh                 # bulk-load the NAR CSVs and rebuild indexes
+./scripts/db-optimize.sh                      # one-time: covering index + VACUUM ANALYZE
+./scripts/db-start.sh                         # start Postgres (./scripts/db-stop.sh to stop)
 ./scripts/random-address.sh Burlington
 ./scripts/random-address.sh Burlington ON
 ./scripts/random-address.sh --city Burlington --province ON
@@ -123,7 +126,7 @@ postgresql://janac@127.0.0.1:55432/random_address_retriever
 Storage after import (on the FATRIOT APFS SSD):
 
 - Postgres logical database size: about `5.3 GB`
-- Data directory (`/Volumes/FATRIOT/postgres/data`): about `6.3 GB`
+- Data directory on the FATRIOT SSD (`/Volumes/FATRIOT/postgres/data`): about `6.3 GB`
 - Covering index for fast lookups (`scripts/db-optimize.sh`): about `2.7 GB`
 
 Useful query:
@@ -142,6 +145,7 @@ LIMIT 1;
 - [Data source decision](DATA_SOURCE_DECISION.md)
 - [Requirements](REQUIREMENTS.md)
 - [Findings and learnings](docs/LEARNINGS.md)
+- [FATRIOT link speed & cabling](docs/FATRIOT-LINK-AND-CABLING.md)
 - [Cloudflare Tunnel and Netlify setup](docs/CLOUDFLARE_NETLIFY.md)
 - [NAR reference files](docs/reference/)
 - [TODO](TODO.md)

@@ -9,9 +9,6 @@ jobs:
   test:
     name: typecheck, build, test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
 
     services:
       postgres:
@@ -39,26 +36,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: npm
-          cache-dependency-path: server/package-lock.json
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck
-        run: npm run typecheck
+        run: pnpm --filter random-address-api run typecheck
 
       - name: Build
-        run: npm run build
+        run: pnpm --filter random-address-api run build
 
       - name: Seed test database
+        working-directory: server
         run: psql "postgresql://postgres:postgres@127.0.0.1:5432/random_address_retriever" -v ON_ERROR_STOP=1 -f test/fixtures/seed.sql
 
       - name: Test (unit + integration)
-        run: npm test
+        run: pnpm --filter random-address-api run test
         env:
           RUN_DB_TESTS: "1"
           TEST_CITY: Burlington

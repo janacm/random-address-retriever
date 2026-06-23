@@ -65,12 +65,12 @@ value is invalid.
 ## Develop
 
 ```bash
-npm install
-npm run dev        # tsx watch, hot reload
-npm run typecheck  # tsc --noEmit
-npm test           # unit tests (no database needed)
-npm run build      # bundle to dist/ with tsup
-npm start          # node dist/index.js
+pnpm install       # installs the whole workspace (run from anywhere in the repo)
+pnpm dev           # tsx watch, hot reload
+pnpm typecheck     # tsc --noEmit
+pnpm test          # unit tests (no database needed)
+pnpm build         # bundle to dist/ with tsup
+pnpm start         # node dist/index.js
 ```
 
 From the repo root, `./scripts/api-start.sh` mounts/starts Postgres, installs
@@ -86,7 +86,7 @@ and builds the API if needed, and runs it.
 
 ```bash
 # Against the local NAR database:
-RUN_DB_TESTS=1 ADDRESS_API_TOKEN=x npm test
+RUN_DB_TESTS=1 ADDRESS_API_TOKEN=x pnpm test
 ```
 
 CI seeds a tiny `nar_addresses` into a `postgres:16` service and runs both
