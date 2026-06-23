@@ -1,5 +1,7 @@
 import type { HealthResponse, RandomAddressQuery, RandomAddressResponse } from "./types";
 
+// Dev-only bearer token. In production, the Netlify Edge Function proxy injects
+// the real token server-side, so it is never sent (or bundled) for prod builds.
 const LOCAL_DEV_TOKEN = "local-dev-token";
 const ADDRESS_API_TOKEN = import.meta.env.VITE_ADDRESS_API_TOKEN ?? LOCAL_DEV_TOKEN;
 
@@ -20,10 +22,17 @@ export class AddressApiError extends Error {
   }
 }
 
-function authHeaders() {
-  return {
-    authorization: `Bearer ${ADDRESS_API_TOKEN}`,
-  };
+// Requests are same-origin and relative (`/api/*`, `/healthz`):
+// - Dev: the Vite dev server proxies them to the local API, which requires the
+//   bearer token (see apps/web/vite.config.ts).
+// - Prod: the Netlify Edge Function proxy injects the real token server-side,
+//   so the browser sends no auth header and no token ships in the bundle.
+function authHeaders(): Record<string, string> {
+  if (import.meta.env.DEV) {
+    return { authorization: `Bearer ${ADDRESS_API_TOKEN}` };
+  }
+
+  return {};
 }
 
 async function readJson<T>(response: Response): Promise<T> {
