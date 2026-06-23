@@ -1,3 +1,7 @@
+# Copy to cloudflare/tunnel/config.yml for local testing.
+# For the LaunchDaemon, install the live copy OUTSIDE ~/Documents at
+# /usr/local/etc/cloudflared/config.yml (macOS TCC blocks daemons from
+# ~/Documents). See docs/CLOUDFLARE_NETLIFY.md.
 tunnel: random-address-api
 credentials-file: /Users/janac/.cloudflared/<tunnel-id>.json
 
