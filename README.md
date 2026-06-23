@@ -32,14 +32,14 @@ sql/          Postgres schema for imported NAR CSV chunks
 Install dependencies once:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Start Postgres, then start the app:
 
 ```bash
 ./scripts/db-start.sh
-npm run dev
+pnpm dev
 ```
 
 Open the frontend at:
@@ -48,8 +48,8 @@ Open the frontend at:
 http://127.0.0.1:5173
 ```
 
-`npm install` also installs the API in `server/` (via a postinstall step), and
-`npm run dev` starts both the API and the frontend.
+`pnpm install` installs all workspace packages (the API in `server/` and the web
+app in `apps/web/`), and `pnpm dev` starts both the API and the frontend.
 
 The API (`server/`) listens at `http://127.0.0.1:8787`. In dev mode, the API and
 frontend default to the bearer token `local-dev-token`. Set `ADDRESS_API_TOKEN`
@@ -70,7 +70,7 @@ curl \
 Production API start requires an explicit token:
 
 ```bash
-ADDRESS_API_TOKEN="replace-me" NODE_ENV=production npm --prefix server start
+ADDRESS_API_TOKEN="replace-me" NODE_ENV=production pnpm --filter random-address-api start
 ```
 
 ## Database
