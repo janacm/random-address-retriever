@@ -17,12 +17,12 @@ Local National Address Register search/retrieval workspace.
 
 Postgres data lives directly on the external **FATRIOT** APFS SSD at
 `/Volumes/FATRIOT/postgres/data`. Connect the drive, then manage the cluster with
-`scripts/fatriot-pg.sh` (see [FATRIOT setup](docs/FATRIOT-SETUP.md) and
+`scripts/pg.sh` (see [FATRIOT setup](docs/FATRIOT-SETUP.md) and
 [link & cabling](docs/FATRIOT-LINK-AND-CABLING.md)).
 
 ```bash
-./scripts/fatriot-pg-setup.sh                 # one-time: initdb, schema, bulk load, indexes
-./scripts/fatriot-pg.sh start                 # start cluster (also: stop | restart | status)
+./scripts/pg-setup.sh                         # one-time: initdb, schema, bulk load, indexes
+./scripts/pg.sh start                         # start cluster (also: stop | restart | status)
 ./scripts/random-address.sh Burlington
 ./scripts/random-address.sh Burlington ON
 ./scripts/random-address.sh --city Burlington --province ON

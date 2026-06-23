@@ -1,8 +1,8 @@
-# FATRIOT benchmark setup — Postgres vs DuckDB
+# Postgres setup on the external SSD (FATRIOT)
 
-Both databases are hosted directly on the external APFS volume `/Volumes/FATRIOT`
-and loaded from the same source CSVs, so a DuckDB-vs-Postgres comparison runs
-against the same physical disk and the same data.
+Postgres is hosted directly on the external APFS volume (`/Volumes/FATRIOT` by
+default) and loaded from the staged NAR source CSVs. Point `DB_VOLUME` at a
+different mount if you rename or swap the drive.
 
 ## Layout on /Volumes/FATRIOT
 
@@ -10,31 +10,29 @@ against the same physical disk and the same data.
 /Volumes/FATRIOT/
   Addresses/                 # 27 NAR source CSVs (~3.2 GB), staged from the repo
   postgres/data/             # Postgres 16 cluster (PGDATA)
-  duckdb/addresses.duckdb    # DuckDB database file
   logs/postgres.log          # Postgres server log
 ```
 
 ## Data
 
 - Source: Canadian National Address Register (NAR) export, 29 columns.
-- Table `nar_addresses`, identical column order in both engines.
-- Types: all text except `bg_x` / `bg_y` (numeric in Postgres, DOUBLE in DuckDB).
-- Empty CSV fields import as NULL in both engines (consistent).
+- Table `nar_addresses`, one row per address.
+- Types: all text except `bg_x` / `bg_y` (numeric).
+- Empty CSV fields import as NULL.
 
-## Engines
+## Engine
 
 - PostgreSQL 16.14 (Homebrew `postgresql@16`), port **55432**, socket `/tmp`.
-- DuckDB 1.5.4 (Homebrew `duckdb`).
 
 ## Scripts
 
 | Script | Purpose |
 | --- | --- |
-| `scripts/fatriot-env.sh` | Shared env (paths, port, `LC_ALL=C`). Sourced by the others. |
-| `scripts/fatriot-pg-setup.sh` | initdb → start → schema → bulk `\copy` → indexes → ANALYZE. |
-| `scripts/fatriot-duckdb-setup.sh` | (Re)build the DuckDB file: schema → `COPY` glob → indexes → ANALYZE. |
-| `scripts/fatriot-verify.sh` | Parity check — same aggregates from both engines. |
-| `scripts/fatriot-bench.sh [RUNS]` | Head-to-head latency on a representative workload. |
+| `scripts/pg-env.sh` | Shared env (`DB_VOLUME`, paths, port, `LC_ALL=C`). Sourced by the others. |
+| `scripts/pg-setup.sh` | initdb → start → schema → bulk `\copy` → indexes → ANALYZE. |
+| `scripts/pg.sh {start\|stop\|restart\|status}` | Day-to-day cluster control. |
+| `scripts/pg-bench.sh [RUNS]` | Postgres query latency on a representative workload. |
+| `scripts/disk-bench.sh` | Raw disk throughput vs the internal SSD. |
 
 ## Indexes
 
@@ -42,24 +40,21 @@ Postgres: PK on `addr_guid`; btree on `lower(csd_eng_name)`,
 `(lower(csd_eng_name), mail_prov_abvn)`, `mail_postal_code`,
 `lower(official_street_name)`; GIN trigram on `csd_eng_name`.
 
-DuckDB: ART indexes on `csd_eng_name`, `mail_postal_code`,
-`official_street_name`. DuckDB has no trigram/GIN equivalent — its fuzzy city
-search relies on columnar scans + zonemaps, a known asymmetry to keep in mind
-when reading the fuzzy-search benchmark numbers.
-
 ## Start / stop Postgres
 
+Day-to-day, use the control script (`stop` | `restart` | `status` too):
+
 ```bash
-source scripts/fatriot-env.sh
+scripts/pg.sh start
+```
+
+Or drive `pg_ctl` directly:
+
+```bash
+source scripts/pg-env.sh
 pg_ctl -D "$PGDATA" -l "$PG_LOGDIR/postgres.log" -o "-p $PGPORT -k /tmp" start
 pg_ctl -D "$PGDATA" stop
 psql -h 127.0.0.1 -p 55432 -d random_address_retriever   # connect
-```
-
-DuckDB is file-based — no server to run:
-
-```bash
-/opt/homebrew/bin/duckdb /Volumes/FATRIOT/duckdb/addresses.duckdb
 ```
 
 ## Notes

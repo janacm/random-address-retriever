@@ -135,11 +135,11 @@ Start/stop the FATRIOT Postgres cluster with the control script (added alongside
 these findings):
 
 ```bash
-scripts/fatriot-pg.sh start     # start if not already running
-scripts/fatriot-pg.sh stop      # fast shutdown
-scripts/fatriot-pg.sh restart   # stop (if running) then start
-scripts/fatriot-pg.sh status    # pg_ctl status
+scripts/pg.sh start     # start if not already running
+scripts/pg.sh stop      # fast shutdown
+scripts/pg.sh restart   # stop (if running) then start
+scripts/pg.sh status    # pg_ctl status
 ```
 
 It guards against the drive not being mounted and against a missing cluster
-(pointing you to `scripts/fatriot-pg-setup.sh`).
+(pointing you to `scripts/pg-setup.sh`).

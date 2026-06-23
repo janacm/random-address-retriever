@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
-# Start / stop the FATRIOT-hosted Postgres cluster.
+# Start / stop the external-SSD Postgres cluster.
 #
 # This is the lightweight day-to-day control for the cluster that
-# scripts/fatriot-pg-setup.sh initializes and loads. It only manages the
+# scripts/pg-setup.sh initializes and loads. It only manages the
 # server process; it does not touch data. Runtime tuning persists in
 # postgresql.auto.conf, so a plain start picks it up automatically.
 #
 # Usage:
-#   scripts/fatriot-pg.sh start     # start if not already running
-#   scripts/fatriot-pg.sh stop      # fast shutdown
-#   scripts/fatriot-pg.sh restart   # stop (if running) then start
-#   scripts/fatriot-pg.sh status    # report pg_ctl status
+#   scripts/pg.sh start     # start if not already running
+#   scripts/pg.sh stop      # fast shutdown
+#   scripts/pg.sh restart   # stop (if running) then start
+#   scripts/pg.sh status    # report pg_ctl status
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$ROOT_DIR/scripts/fatriot-env.sh"
+source "$ROOT_DIR/scripts/pg-env.sh"
 
 usage() {
   echo "Usage: $(basename "$0") {start|stop|restart|status}" >&2
@@ -22,8 +22,8 @@ usage() {
 }
 
 require_volume() {
-  if [[ ! -d "$FATRIOT" ]]; then
-    echo "FATRIOT volume is not mounted at $FATRIOT" >&2
+  if [[ ! -d "$DB_VOLUME" ]]; then
+    echo "Database volume is not mounted at $DB_VOLUME" >&2
     exit 1
   fi
 }
@@ -32,7 +32,7 @@ start_pg() {
   require_volume
   if [[ ! -d "$PGDATA/base" ]]; then
     echo "No Postgres cluster at $PGDATA." >&2
-    echo "Run scripts/fatriot-pg-setup.sh first to initialize it." >&2
+    echo "Run scripts/pg-setup.sh first to initialize it." >&2
     exit 1
   fi
   if pg_ctl -D "$PGDATA" status >/dev/null 2>&1; then

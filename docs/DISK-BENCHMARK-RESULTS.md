@@ -1,7 +1,7 @@
 # Disk benchmark: FATRIOT vs internal Mac SSD
 
 Raw device throughput, **not** a database benchmark. Identical workload on each
-target via `scripts/fatriot-disk-bench.sh` → `scripts/disk_bench.py`, which uses
+target via `scripts/disk-bench.sh` → `scripts/disk_bench.py`, which uses
 macOS `F_NOCACHE` so every pass hits the device instead of the unified buffer
 cache (no `sudo purge` required). 2 GiB sequential payload, 8 MiB blocks, 3
 passes (median). Machine: Mac17,2, 10-core, 16 GB.
@@ -57,23 +57,21 @@ Raw CSV: `docs/disk-bench-results.csv`.
 
 ## Implication for the DB benchmark (measured)
 
-Re-ran `scripts/fatriot-bench.sh` on the TB5 link (results: `/Volumes/FATRIOT/bench-results-tb5.csv`).
+Re-ran `scripts/pg-bench.sh` on the TB5 link (results: `/Volumes/FATRIOT/bench-results-tb5.csv`).
 The cable only moves **cold** (first-run, disk-bound) times — **warm** times are
 served from Postgres's 2 GB buffer cache / OS cache and are unchanged within noise.
 
 Cold-scan gains, USB 2.0 → TB5:
 
-| Query | PG cold | DuckDB cold |
-|---|--:|--:|
-| `city_prov_count` | 35.5 s → 2.8 s (**12.5×**) | 625 → 36 ms (17×) |
-| `street_prefix` | 40.3 s → 11.2 s (3.6×) | 2.6 s → 408 ms (6.4×) |
-| `top20_cities` | 112 s → 53 s (2.1×) | 1.06 s → 178 ms (5.9×) |
-| `distinct_postal` | 3.6 s → 0.73 s (5.0×) | 2.2 s → 336 ms (6.7×) |
+| Query | PG cold (USB 2.0 → TB5) |
+|---|--:|
+| `city_prov_count` | 35.5 s → 2.8 s (**12.5×**) |
+| `street_prefix` | 40.3 s → 11.2 s (3.6×) |
+| `top20_cities` | 112 s → 53 s (2.1×) |
+| `distinct_postal` | 3.6 s → 0.73 s (5.0×) |
 
 The gain tracks the **access pattern**, not a flat multiplier:
 
-- **DuckDB cold improved ~6–17×** — near the raw-sequential gain, because it streams
-  compressed columns in big chunks (bandwidth-bound — exactly what the cable fixed).
 - **Postgres heap scans improved only ~2–12×.** `top20_cities` (un-indexed full
   5.3 GB heap scan) is still ~53 s cold ≈ ~100 MB/s effective, far below the drive's
   707 MB/s sequential. Postgres reads the heap in 8 KB blocks, so those scans are
@@ -81,7 +79,7 @@ The gain tracks the **access pattern**, not a flat multiplier:
 
 So the original "35–112 s cold" numbers in `docs/BENCHMARK-RESULTS.md` were partly a
 USB-2.0-cable artifact, but Postgres full-heap scans stay slow on *any* USB link
-because they're latency-bound, not bandwidth-bound. The engine ranking is unchanged.
+because they're latency-bound, not bandwidth-bound.
 
 > Gotcha found while re-running: restarting Postgres with the bare `pg_ctl ... -o "-p $PGPORT -k /tmp"`
 > command from `FATRIOT-SETUP.md` loses the runtime tuning (`shared_buffers`,
@@ -92,7 +90,7 @@ because they're latency-bound, not bandwidth-bound. The engine ranking is unchan
 ## Reproduce
 
 ```bash
-scripts/fatriot-disk-bench.sh                       # writes docs/disk-bench-results.csv
-CSV=docs/disk-bench-results-tb5.csv scripts/fatriot-disk-bench.sh
-SIZE_MB=4096 PASSES=5 scripts/fatriot-disk-bench.sh # heavier run
+scripts/disk-bench.sh                       # writes docs/disk-bench-results.csv
+CSV=docs/disk-bench-results-tb5.csv scripts/disk-bench.sh
+SIZE_MB=4096 PASSES=5 scripts/disk-bench.sh # heavier run
 ```
