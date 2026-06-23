@@ -10,15 +10,17 @@ The first useful workflow is:
 give me a random address for Burlington
 ```
 
-The local implementation should return a real NAR address quickly, with enough metadata to inspect or trace the source row.
+The local implementation should return a real NAR address quickly through both a
+CLI and browser frontend, with enough metadata to inspect or trace the source
+row when verbose/source mode is enabled.
 
 ## Current Requirements
 
 1. Store and query the NAR CSV data locally.
 2. Use the `Addresses/Address_*.csv` files as the canonical import source.
 3. Run Postgres locally without requiring Docker.
-4. Keep Postgres storage on the Samsung T5 external SSD.
-5. Avoid storing Postgres directly on the ExFAT filesystem.
+4. Keep Postgres storage on the external SSD (`FATRIOT`, APFS).
+5. Store the Postgres cluster directly on the APFS SSD (no sparseimage needed).
 6. Keep large datasets and database files out of Git.
 7. Import all available NAR CSV chunks into one queryable table.
 8. Support random address lookup by exact city name.
@@ -32,8 +34,14 @@ The local implementation should return a real NAR address quickly, with enough m
     - `loc_guid`
     - `addr_guid`
 12. Provide simple local scripts for database start, stop, import, random lookup, and API startup.
-13. Expose the MacBook-hosted backend through Cloudflare Tunnel rather than NAS hosting.
-14. Keep the DS220j as backup/support storage only.
+13. Provide a narrow local HTTP API for random address lookup.
+14. Require bearer-token authorization for API requests.
+15. Validate city and province inputs before querying Postgres.
+16. Use parameterized SQL only.
+17. Provide a local browser frontend for city/province lookup.
+18. Keep the API in `server/` (TypeScript) and the web frontend in `apps/web`.
+19. Expose the MacBook-hosted backend through Cloudflare Tunnel rather than NAS hosting.
+20. Keep the DS220j as backup/support storage only.
 
 ## Data Requirements
 
@@ -79,6 +87,10 @@ Current verified counts:
 - `Burlington, ON`: `79,160`
 - `Burlington, NL`: `101`
 
+The CLI uses the exact indexed city/province query with `ORDER BY random()`.
+The HTTP API uses an existence check plus sampled lookup first for interactive
+latency, and falls back to the exact query if sampling does not find a match.
+
 ## Operational Requirements
 
 Postgres connection:
@@ -96,17 +108,34 @@ Required scripts:
 - `scripts/random-address.sh`
 - `scripts/api-start.sh`
 
-The local Postgres cluster must live inside:
+Node workspace commands:
+
+- `npm run dev` starts both the local API and web frontend.
+- `npm run build` builds all workspaces that define a build script.
+- `npm test` runs workspace tests.
+
+Local API:
+
+- `GET /healthz`
+- `GET /api/random-address?city=Burlington&province=ON&verbose=true`
+- `GET /api/provinces`
+- API host defaults to `127.0.0.1`.
+- API port defaults to `8787`.
+- Dev token defaults to `local-dev-token`.
+- `NODE_ENV=production` requires an explicit `ADDRESS_API_TOKEN`.
+
+Frontend:
+
+- Vite dev server defaults to `http://127.0.0.1:5173`.
+- The web app proxies `/api` and `/healthz` to the local API in development.
+
+The local Postgres cluster lives on the external APFS SSD at:
 
 ```text
-.postgres/random-address-postgres.sparseimage
+/Volumes/FATRIOT/postgres/data
 ```
 
-The image mounts at:
-
-```text
-/Volumes/random-address-postgres
-```
+Override `PG_MOUNT`/`PGDATA` (for example in `.env.local`) to relocate it.
 
 ## API Requirements
 
@@ -114,13 +143,18 @@ The local API must:
 
 - Bind to `127.0.0.1` by default.
 - Listen on port `8787` by default.
-- Require `ADDRESS_API_TOKEN` for every request.
+- Require `ADDRESS_API_TOKEN` for every request (constant-time comparison).
 - Support `GET /healthz`.
 - Support `GET /random-address?city=Burlington&province=ON`.
 - Support optional `verbose=true` output with source identifiers.
-- Use fixed SQL with safely quoted caller values.
+- Use parameterized SQL (`$1`, `$2`); never interpolate caller values.
 - Never expose raw SQL or direct Postgres credentials.
 - Return JSON only.
+
+The API is implemented in `server/` as a strongly-typed
+[Fastify](https://fastify.dev) + TypeScript service with a pooled `pg`
+connection, unit/integration tests, and CI (see
+[server/README.md](server/README.md)). The web frontend in `apps/web` calls it.
 
 The Cloudflare/Netlify path must:
 
@@ -143,7 +177,7 @@ Write performance is explicitly out of scope:
   not optimization targets.
 - This is acceptable because `nar_addresses` is `UNLOGGED`, the table is loaded
   once and then queried, and the source CSVs are retained so it can be rebuilt.
-- The ExFAT/sparseimage storage stack has a large `fsync`/write penalty
+- The earlier ExFAT/sparseimage storage stack had a large `fsync`/write penalty
   (~33x slower than the internal SSD in local benchmarks), but this does not
   affect the read-only workload we care about.
 
@@ -157,23 +191,34 @@ Current acceptable baseline:
 
 ## Constraints
 
-- The Samsung T5 is currently formatted as ExFAT.
-- Direct Postgres initialization on ExFAT failed because macOS created `._*` AppleDouble files inside Postgres internals.
-- Postgres storage must therefore use the APFS sparseimage workaround unless the drive is reformatted.
+- Postgres storage uses the external APFS SSD `FATRIOT`, so the cluster is stored directly with no sparseimage workaround.
+- Historical: an earlier ExFAT drive (Samsung T5) required an APFS sparseimage because macOS created `._*` AppleDouble files inside the Postgres data directory (see docs/LEARNINGS.md).
 - Source datasets and generated database storage must not be committed to Git.
 - Current coordinates are `BG_X` and `BG_Y`; latitude/longitude are not part of the active CSV table.
 - The DS220j is not the selected live-hosting target for this database.
 
+## Tooling And Quality Requirements
+
+- The API is written in TypeScript with strict typing.
+- Inputs are validated at the edge (TypeBox schema → runtime + static types).
+- The HTTP layer is testable without a database (dependency-injected `Database`).
+- Unit tests run with no external services; integration tests run against a real
+  Postgres when `RUN_DB_TESTS=1`.
+- CI (GitHub Actions) runs typecheck, build, unit tests, and integration tests
+  against a seeded `postgres:16` service.
+
 ## Out Of Scope For Now
 
-- Web frontend.
 - Public direct REST or GraphQL API.
+- Public hosting.
+- Cloudflare Tunnel automation.
+- Netlify server route deployment.
 - Fuzzy city search.
 - Postal-code radius search.
 - PostGIS geospatial search.
 - Normalized location/address tables.
 - Packaging for another machine.
-- Automated tests.
+- End-to-end browser tests.
 
 ## Open Questions
 

@@ -25,17 +25,22 @@
 - Direct Postgres initialization on the ExFAT volume failed.
 - Failure mode: macOS created AppleDouble `._*` files inside the Postgres data directory, and Postgres rejected the unexpected files during initialization.
 - A sparsebundle also worked poorly for this workload because it creates many band files on the ExFAT host filesystem.
-- The working solution is a single APFS sparseimage stored on the Samsung T5:
+- The working solution at the time was a single APFS sparseimage stored on the Samsung T5:
 
 ```text
 .postgres/random-address-postgres.sparseimage
 ```
 
-- The sparseimage mounts at:
+- The sparseimage mounted at:
 
 ```text
 /Volumes/random-address-postgres
 ```
+
+- **Update:** the project later moved to the external APFS SSD `FATRIOT`, which
+  stores the Postgres cluster directly at `/Volumes/FATRIOT/postgres/data`. Since
+  that drive is APFS (not ExFAT), the sparseimage workaround is no longer needed,
+  and `scripts/db-env.sh` points `PGDATA` there.
 
 ## Postgres Findings
 
@@ -85,10 +90,32 @@ postgresql://janac@127.0.0.1:55432/random_address_retriever
 - The city index is used for exact city lookups.
 - A Burlington random lookup was observed around `158 ms` on a cold-ish cache.
 
+## Read-Latency Findings (cold cache)
+
+- A truly cold `Burlington, ON` random pick measured **~16.8 s**, not ~158 ms.
+- Cause: `ORDER BY random() LIMIT 1` filtered by city did a **Bitmap Heap Scan**
+  fetching every matching row (`~79,160` rows ≈ `62,732` heap blocks ≈ 490 MB of
+  scattered random reads) just to choose one. On the external USB SSD, cold
+  random reads are slow, so the heap fetch dominated.
+- The table had **never been `VACUUM`ed**, so the visibility map was unset and
+  index-only scans were impossible — every plan fell through to the heap.
+- Fix, in two parts (`scripts/db-optimize.sh`):
+  1. `VACUUM (ANALYZE)` to set the visibility map.
+  2. A **covering index** `nar_addresses_random_pick_idx` on
+     `(lower(csd_eng_name), mail_prov_abvn)` that `INCLUDE`s every returned
+     column.
+- Result: the pick becomes an **Index Only Scan** (`Heap Fetches: 0`) reading
+  only the city's `~1,620` *contiguous* index pages. Warm dropped to **~20 ms**;
+  cold drops from ~16.8 s to a few hundred ms at worst.
+- The covering index is `~2.7 GB` for the full dataset. Acceptable: read latency
+  is the only performance target, and write/build cost is out of scope.
+- The API also replaced a per-request `psql` subprocess with a pooled `pg`
+  client, removing process-spawn overhead from every request.
+
 ## Current Gaps
 
 - The local API exists, but it has not yet been installed as a launch agent or paired with a running Cloudflare tunnel.
-- There are no automated tests yet.
+- The API is now a typed Fastify service with unit + integration tests and CI.
 - Random selection is currently row-based, not location-based.
 - City matching is exact against `csd_eng_name`.
 - No geospatial queries are implemented yet.

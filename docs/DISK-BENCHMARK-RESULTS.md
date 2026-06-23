@@ -57,7 +57,7 @@ Raw CSV: `docs/disk-bench-results.csv`.
 
 ## Implication for the DB benchmark (measured)
 
-Re-ran `scripts/pg-bench.sh` on the TB5 link (results: `/Volumes/FATRIOT/bench-results-tb5.csv`).
+Re-ran `scripts/db-bench.sh` on the TB5 link (results: `/Volumes/FATRIOT/bench-results-tb5.csv`).
 The cable only moves **cold** (first-run, disk-bound) times — **warm** times are
 served from Postgres's 2 GB buffer cache / OS cache and are unchanged within noise.
 

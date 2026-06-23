@@ -1,0 +1,19 @@
+{
+  "name": "random-address-retriever",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "postinstall": "npm --prefix server install --no-audit --no-fund",
+    "dev": "concurrently -n api,web -c green,blue \"npm --prefix server run dev\" \"npm run dev -w @random-address/web\"",
+    "build": "npm --prefix server run build && npm run build --workspaces --if-present",
+    "test": "npm --prefix server test && npm run test --workspaces --if-present",
+    "typecheck": "npm --prefix server run typecheck",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

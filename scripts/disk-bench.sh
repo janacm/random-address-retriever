@@ -10,17 +10,17 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
-source "$ROOT_DIR/scripts/pg-env.sh"
+source "$ROOT_DIR/scripts/db-env.sh"
 
-if [[ ! -d "$DB_VOLUME" ]]; then
-  echo "Database volume not mounted at $DB_VOLUME" >&2
+if [[ ! -d "$PG_MOUNT" ]]; then
+  echo "Database volume not mounted at $PG_MOUNT" >&2
   exit 1
 fi
 
 # Internal SSD scratch dir (TMPDIR lives on the internal APFS Data volume);
 # fall back to $HOME. The external scratch dir lives on the database volume.
 INT_DIR="$(mktemp -d "${TMPDIR:-$HOME}/disk-bench.XXXXXX")"
-EXT_DIR="$(mktemp -d "$DB_VOLUME/disk-bench.XXXXXX")"
+EXT_DIR="$(mktemp -d "$PG_MOUNT/disk-bench.XXXXXX")"
 trap 'rm -rf "$INT_DIR" "$EXT_DIR"' EXIT
 
 export CSV="${CSV:-$ROOT_DIR/docs/disk-bench-results.csv}"

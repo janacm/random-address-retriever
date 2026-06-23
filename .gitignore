@@ -4,6 +4,13 @@
 .env.local
 .env.*.local
 
+# Node / TypeScript dependencies and build output.
+node_modules/
+/apps/*/node_modules/
+/apps/*/dist/
+/server/dist/
+*.tsbuildinfo
+
 # Local Postgres storage and runtime files.
 /.postgres/
 /logs/

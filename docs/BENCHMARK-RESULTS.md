@@ -2,7 +2,7 @@
 
 Same 17,169,294-row NAR dataset on the external APFS volume (`/Volumes/FATRIOT`),
 hosted by Postgres 16. 7 runs per query: **cold** = 1st run, **warm** = median of
-the rest. Numbers in milliseconds. Regenerate with `scripts/pg-bench.sh`
+the rest. Numbers in milliseconds. Regenerate with `scripts/db-bench.sh`
 (CSV: `/Volumes/FATRIOT/bench-results.csv`).
 
 | Query | What it tests | Cold | Warm |

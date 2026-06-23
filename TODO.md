@@ -27,17 +27,32 @@
 - [x] Build a narrow local HTTP API for random address lookup.
 - [x] Require an API token for every request.
 - [x] Validate city and province inputs.
-- [x] Use fixed SQL and safely quoted caller values.
+- [x] Use parameterized SQL only.
 - [x] Do not expose arbitrary SQL or direct database credentials.
 - [x] Add Cloudflare Tunnel config template.
 - [x] Add Netlify/Next proxy route example.
-- [ ] Add basic rate limiting.
+- [x] Add basic rate limiting.
+
+## Frontend
+
+- [x] Build a local browser interface for city/province random address lookup.
+- [x] Keep source GUIDs hidden unless the source identifiers toggle is enabled.
+- [ ] Add end-to-end browser coverage once the API and database are stable.
+
+## Backend Quality
+
+- [x] Rewrite the API in TypeScript (Fastify + pooled `pg`) with strong typing.
+- [x] Add unit tests (config, auth, HTTP layer via `app.inject`).
+- [x] Add integration tests against a real Postgres (gated by `RUN_DB_TESTS`).
+- [x] Add GitHub Actions CI (typecheck, build, unit + integration tests).
+- [x] Optimize cold read latency (covering index + VACUUM; `db-optimize.sh`).
+- [x] Consolidate to a single API in `server/` (Fastify TS); `apps/web` calls it.
 
 ## Database Operations
 
 - [ ] Add a backup script using `pg_dump`.
 - [ ] Add a restore script or documented restore command.
-- [ ] Add a health-check script for Postgres and the local API.
+- [x] Add a health-check script for Postgres and the local API.
 - [ ] Document how to restart the tunnel and API after reboot.
 
 ## Product Questions

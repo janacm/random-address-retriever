@@ -131,15 +131,12 @@ ioreg -r -c IOUSBHostDevice -w0 -l | grep -iE "patriot|\"Device Speed\""
 # Device Speed = 4  ->  10 Gb/s (USB 3.2 Gen 2)
 ```
 
-Start/stop the FATRIOT Postgres cluster with the control script (added alongside
-these findings):
+Start/stop the FATRIOT Postgres cluster with the lifecycle scripts:
 
 ```bash
-scripts/pg.sh start     # start if not already running
-scripts/pg.sh stop      # fast shutdown
-scripts/pg.sh restart   # stop (if running) then start
-scripts/pg.sh status    # pg_ctl status
+scripts/db-start.sh    # start (initializes the cluster on first run)
+scripts/db-stop.sh     # stop
 ```
 
-It guards against the drive not being mounted and against a missing cluster
-(pointing you to `scripts/pg-setup.sh`).
+`db-start.sh` verifies the drive is mounted (via `db-mount.sh`) and initializes
+the cluster on first run with `db-init.sh`.

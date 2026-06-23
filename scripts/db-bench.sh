@@ -4,13 +4,13 @@
 # from psql's own \timing, so client/connection startup is excluded and only query
 # planning+execution is measured.
 #
-# Usage: scripts/pg-bench.sh [RUNS]   (default 7)
+# Usage: scripts/db-bench.sh [RUNS]   (default 7)
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
-source "$ROOT_DIR/scripts/pg-env.sh"
+source "$ROOT_DIR/scripts/db-env.sh"
 RUNS="${1:-7}"
-RESULTS="${RESULTS:-$DB_VOLUME/bench-results.csv}"
+RESULTS="${RESULTS:-$PG_MOUNT/bench-results.csv}"
 
 # ---- preflight: Postgres must be usable, or we'd write an all-blank CSV ----
 command -v psql >/dev/null 2>&1 || { echo "FATAL: psql not found on PATH" >&2; exit 1; }

@@ -1,8 +1,8 @@
 # Postgres setup on the external SSD (FATRIOT)
 
 Postgres is hosted directly on the external APFS volume (`/Volumes/FATRIOT` by
-default) and loaded from the staged NAR source CSVs. Point `DB_VOLUME` at a
-different mount if you rename or swap the drive.
+default) and loaded from the staged NAR source CSVs. Override `PG_MOUNT`/`PGDATA`
+if you rename or swap the drive.
 
 ## Layout on /Volumes/FATRIOT
 
@@ -28,10 +28,12 @@ different mount if you rename or swap the drive.
 
 | Script | Purpose |
 | --- | --- |
-| `scripts/pg-env.sh` | Shared env (`DB_VOLUME`, paths, port, `LC_ALL=C`). Sourced by the others. |
-| `scripts/pg-setup.sh` | initdb → start → schema → bulk `\copy` → indexes → ANALYZE. |
-| `scripts/pg.sh {start\|stop\|restart\|status}` | Day-to-day cluster control. |
-| `scripts/pg-bench.sh [RUNS]` | Postgres query latency on a representative workload. |
+| `scripts/db-env.sh` | Shared env (`PG_MOUNT`, `PGDATA`, port). Sourced by the others. |
+| `scripts/db-init.sh` | initdb + database + schema (`sql/schema.sql`). |
+| `scripts/import-addresses.sh` | Bulk `\copy` the NAR CSVs, then rebuild indexes + ANALYZE. |
+| `scripts/db-start.sh` / `scripts/db-stop.sh` | Start / stop the cluster (verifies the drive is mounted). |
+| `scripts/db-optimize.sh` | Build the covering index + VACUUM ANALYZE for fast lookups. |
+| `scripts/db-bench.sh [RUNS]` | Postgres query latency on a representative workload. |
 | `scripts/disk-bench.sh` | Raw disk throughput vs the internal SSD. |
 
 ## Indexes
@@ -42,30 +44,26 @@ Postgres: PK on `addr_guid`; btree on `lower(csd_eng_name)`,
 
 ## Start / stop Postgres
 
-Day-to-day, use the control script (`stop` | `restart` | `status` too):
+Day-to-day, use the lifecycle scripts:
 
 ```bash
-scripts/pg.sh start
+scripts/db-start.sh    # start (initializes the cluster on first run)
+scripts/db-stop.sh     # stop
 ```
 
 Or drive `pg_ctl` directly:
 
 ```bash
-source scripts/pg-env.sh
-pg_ctl -D "$PGDATA" -l "$PG_LOGDIR/postgres.log" -o "-p $PGPORT -k /tmp" start
+source scripts/db-env.sh
+pg_ctl -D "$PGDATA" -l logs/postgres.log -o "-p $PGPORT -k /tmp" start
 pg_ctl -D "$PGDATA" stop
 psql -h 127.0.0.1 -p 55432 -d random_address_retriever   # connect
 ```
 
 ## Notes
 
-- The cluster is `UNLOGGED` + tuned for a single-user benchmark box
-  (`shared_buffers=2GB`, `work_mem=256MB`, `maintenance_work_mem=1GB`,
-  `max_wal_size=8GB`), not a production config. These are persisted via
-  `ALTER SYSTEM` (in `postgresql.auto.conf`), so the bare `pg_ctl ... start`
-  above keeps them. **Do not** rely on passing them as one-off `-c` runtime
-  flags — restarting without them silently reverts to defaults
-  (`shared_buffers=128MB`, `work_mem=4MB`), which detunes every scan (e.g.
-  `work_mem=4MB` makes the `city_fuzzy` bitmap go lossy: ~64 s vs ~0.23 s).
-- `LC_ALL=C` is required on this macOS build or Postgres 16 dies at startup with
-  "postmaster became multithreaded during startup".
+- `nar_addresses` is `UNLOGGED` (see `sql/schema.sql`) — fast bulk loads, but the
+  table is truncated on crash recovery; fine for this local, reload-from-CSV setup.
+- The cluster is initialized with `--locale=C` (`scripts/db-init.sh`). Any
+  single-user tuning applied via `ALTER SYSTEM` persists in `postgresql.auto.conf`
+  inside `PGDATA`, so a plain `db-start.sh` keeps it across restarts.
