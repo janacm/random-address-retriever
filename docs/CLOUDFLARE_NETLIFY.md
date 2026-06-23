@@ -100,6 +100,94 @@ Run the tunnel:
 cloudflared tunnel --config cloudflare/tunnel/config.yml run
 ```
 
+## Run As A Background Service (launchd)
+
+For an always-on tunnel, run `cloudflared` as a system LaunchDaemon instead of a
+foreground process. The daemon is defined at:
+
+```text
+/Library/LaunchDaemons/com.cloudflare.cloudflared.plist
+```
+
+It runs as `root` with `RunAtLoad` and `KeepAlive`, so it starts on boot and
+restarts if it exits.
+
+**Critical: the config file must NOT live inside `~/Documents` (or `~/Desktop` /
+`~/Downloads`).** macOS TCC privacy protection blocks background daemons from
+reading those folders, even as `root`. A daemon pointed at a config under
+`~/Documents` fails every start with:
+
+```text
+open .../cloudflare/tunnel/config.yml: operation not permitted
+```
+
+and crash-loops (every ~5s with the default `ThrottleInterval`), which surfaces
+publicly as Cloudflare `error code: 1033` — the edge has no connected origin.
+
+Keep the repo copy as `cloudflare/tunnel/config.example.yml`, but install the
+live config the daemon reads to a non-protected location:
+
+```bash
+sudo mkdir -p /usr/local/etc/cloudflared
+sudo cp cloudflare/tunnel/config.yml /usr/local/etc/cloudflared/config.yml
+```
+
+The daemon's `--config` argument must point at that path:
+
+```text
+/usr/local/etc/cloudflared/config.yml
+```
+
+The `credentials-file` (`~/.cloudflared/<tunnel-id>.json`) can stay in the home
+directory — `~/.cloudflared` is not TCC-protected.
+
+Load or reload the daemon after any config or plist change:
+
+```bash
+sudo launchctl bootout system /Library/LaunchDaemons/com.cloudflare.cloudflared.plist 2>/dev/null
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.cloudflare.cloudflared.plist
+```
+
+Note: if you edit routing/ingress, update the `/usr/local/etc/cloudflared/` copy
+(or re-copy from the repo) and reload — editing only the repo file has no effect.
+
+## Verify The Tunnel
+
+Confirm four edge connections registered:
+
+```bash
+tail -n 20 /Library/Logs/com.cloudflare.cloudflared.err.log   # expect "Registered tunnel connection" x4
+```
+
+Confirm the public health endpoint returns `200` end-to-end:
+
+```bash
+set -a; . ./.env.local; set +a
+curl -s -o /dev/null -w "HTTP %{http_code}\n" \
+  -H "Authorization: Bearer $ADDRESS_API_TOKEN" \
+  https://address-api.janac.me/healthz
+```
+
+A healthy response body looks like:
+
+```json
+{"data":{"ok":true,"database":"random_address_retriever","durationMs":0}}
+```
+
+## Troubleshooting
+
+- **`error code: 1033`** — the Cloudflare edge has no connected origin. Check the
+  daemon log for `operation not permitted` (TCC: move the config out of
+  `~/Documents`) or another crash loop, then reload the daemon.
+- **`sudo: /var/db/sudo/ts is world writable`** — the sudo timestamp directory
+  has unsafe permissions (it also forces a password prompt on every command).
+  Fix:
+
+```bash
+sudo chown -R root:wheel /var/db/sudo/ts
+sudo chmod 0700 /var/db/sudo/ts
+```
+
 ## Cloudflare Access
 
 Protect the tunnel hostname with Cloudflare Access:

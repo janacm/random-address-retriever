@@ -114,7 +114,7 @@ postgresql://janac@127.0.0.1:55432/random_address_retriever
 
 ## Current Gaps
 
-- The local API exists, but it has not yet been installed as a launch agent or paired with a running Cloudflare tunnel.
+- The local API now runs and is paired with a live Cloudflare tunnel, installed as the `com.cloudflare.cloudflared` LaunchDaemon (see `docs/CLOUDFLARE_NETLIFY.md`).
 - The API is now a typed Fastify service with unit + integration tests and CI.
 - Random selection is currently row-based, not location-based.
 - City matching is exact against `csd_eng_name`.
@@ -125,3 +125,24 @@ postgresql://janac@127.0.0.1:55432/random_address_retriever
 - The selected live path is MacBook-hosted Postgres plus a local HTTP API exposed through Cloudflare Tunnel.
 - The DS220j should be used for backups and source-data storage, not as the live database host.
 - Netlify should call the Cloudflare-protected API from a server-side Next.js route so Cloudflare Access credentials and API tokens never reach browser code.
+
+## Cloudflare Tunnel Learnings
+
+- `cloudflared` runs as a system LaunchDaemon
+  (`/Library/LaunchDaemons/com.cloudflare.cloudflared.plist`, `root`,
+  `RunAtLoad` + `KeepAlive`), so the tunnel starts on boot and self-restarts.
+- **macOS TCC blocks background daemons from `~/Documents`.** The daemon
+  originally pointed `--config` at the repo copy under
+  `~/Documents/.../cloudflare/tunnel/config.yml` and failed every start with
+  `open ...: operation not permitted` — even as `root` — crash-looping every
+  ~5s. Publicly this showed up as Cloudflare `error code: 1033` (no connected
+  origin) and a failing `/healthz`.
+- Fix: install the live config outside the protected folder at
+  `/usr/local/etc/cloudflared/config.yml` and point the plist there. The
+  `credentials-file` under `~/.cloudflared/` was already fine — that path is not
+  TCC-protected. After the move, all four edge connections registered and
+  `/healthz` returned `200`.
+- Unrelated host gotcha hit during setup: `sudo` warned
+  `/var/db/sudo/ts is world writable` (which also forces a password prompt on
+  every command). Fixed with `chown root:wheel` + `chmod 0700` on
+  `/var/db/sudo/ts`.

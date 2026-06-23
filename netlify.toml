@@ -1,0 +1,42 @@
+# Netlify configuration for the Random Address Retriever frontend.
+#
+# - Builds the Vite SPA in apps/web and publishes apps/web/dist.
+# - Proxies /api/* and /healthz through the api-proxy Edge Function, which
+#   injects the API bearer token (and optional Cloudflare Access service-token
+#   headers) server-side, then forwards to the Cloudflare Tunnel hostname.
+# - Falls back to index.html for client-side SPA routing.
+#
+# Required runtime environment variables (set in the Netlify UI):
+#   ADDRESS_API_URL     e.g. https://address-api.janac.me
+#   ADDRESS_API_TOKEN   same value as the local API's .env.local
+# Optional (only if Cloudflare Access is enabled in front of the tunnel):
+#   CF_ACCESS_CLIENT_ID
+#   CF_ACCESS_CLIENT_SECRET
+
+[build]
+  # This branch does not commit a pnpm lockfile, so bootstrap pnpm via corepack-
+  # free global install and let pnpm resolve from package.json (CI defaults to
+  # frozen, hence --no-frozen-lockfile). When the pnpm migration (committing
+  # pnpm-lock.yaml) lands, switch this to `pnpm install --frozen-lockfile`.
+  command = "npm install -g pnpm@9.14.4 && pnpm install --no-frozen-lockfile && pnpm --filter @random-address/web build"
+  publish = "apps/web/dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Edge functions run before redirects, so these intercept API calls and
+# terminate (return a Response) before the SPA fallback below is considered.
+[[edge_functions]]
+  path = "/api/*"
+  function = "api-proxy"
+
+[[edge_functions]]
+  path = "/healthz"
+  function = "api-proxy"
+
+# SPA fallback for client-side routing. Does not affect /api/* or /healthz,
+# which are handled by the Edge Function above.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
