@@ -11,6 +11,12 @@ node_modules/
 /server/dist/
 *.tsbuildinfo
 
+# Playwright e2e artifacts.
+/apps/*/test-results/
+/apps/*/playwright-report/
+/apps/*/blob-report/
+/apps/*/playwright/.cache/
+
 # Netlify CLI link state (site ID, etc.).
 .netlify/
 

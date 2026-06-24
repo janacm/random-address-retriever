@@ -49,3 +49,19 @@ export type RandomAddressQuery = {
   province: ProvinceCode | "";
   verbose: boolean;
 };
+
+export type CitySuggestion = {
+  city: string;
+  province: ProvinceCode | null;
+  addressCount: number;
+};
+
+export type CitiesResponse = {
+  data: CitySuggestion[];
+  meta: {
+    q: string;
+    province: ProvinceCode | null;
+    count: number;
+    durationMs: number;
+  };
+};

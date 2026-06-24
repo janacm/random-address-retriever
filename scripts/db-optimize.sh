@@ -40,6 +40,15 @@ echo "Running VACUUM (VERBOSE, ANALYZE) nar_addresses..."
 psql -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -v ON_ERROR_STOP=1 \
   -c "VACUUM (VERBOSE, ANALYZE) nar_addresses;"
 
+# Populate the city typeahead index. nar_cities is created WITH NO DATA by
+# schema.sql, so it is unscannable — and GET /api/cities errors — until it is
+# refreshed. import-addresses.sh does this after a bulk load; doing it here too
+# means a standalone re-optimize (the documented "make lookups fast" step) also
+# leaves the typeahead working.
+echo "Refreshing nar_cities (city typeahead index)..."
+psql -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -v ON_ERROR_STOP=1 \
+  -c "REFRESH MATERIALIZED VIEW nar_cities;"
+
 echo "Index size:"
 psql -h "$PGHOST" -p "$PGPORT" -d "$PGDATABASE" -At \
   -c "SELECT pg_size_pretty(pg_relation_size('nar_addresses_random_pick_idx'));"

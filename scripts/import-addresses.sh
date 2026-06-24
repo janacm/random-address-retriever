@@ -51,7 +51,13 @@ CREATE INDEX IF NOT EXISTS nar_addresses_city_trgm_idx
 
 ANALYZE nar_addresses;
 
+-- Rebuild the city typeahead index from the freshly imported rows. nar_cities
+-- is a materialized view (created WITH NO DATA by schema.sql), so it stays
+-- empty — and the /api/cities search returns nothing — until refreshed here.
+REFRESH MATERIALIZED VIEW nar_cities;
+
 SELECT count(*) AS imported_rows FROM nar_addresses;
+SELECT count(*) AS city_index_rows FROM nar_cities;
 SQL
 
 echo "Import complete. Run ./scripts/db-optimize.sh to build the covering index for fast lookups."

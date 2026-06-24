@@ -18,12 +18,31 @@ export interface RandomAddressQuery {
   province?: string | undefined;
 }
 
+/** A distinct city as offered by the typeahead. */
+export interface CityRecord {
+  city: string;
+  /** Two-letter province code, or null when results are aggregated nationally. */
+  province: string | null;
+  /** How many addresses the index holds for this city. */
+  addressCount: number;
+}
+
+export interface ListCitiesQuery {
+  /** Free-text fragment to match against city names (already trimmed). */
+  q: string;
+  /** Optional province filter, already upper-cased. */
+  province?: string | undefined;
+  /** Maximum number of suggestions to return. */
+  limit: number;
+}
+
 /**
  * Data-access seam. The HTTP layer depends only on this interface, so tests
  * can inject a fake without a live Postgres.
  */
 export interface Database {
   randomAddress(query: RandomAddressQuery): Promise<AddressRecord | null>;
+  listCities(query: ListCitiesQuery): Promise<CityRecord[]>;
   ping(): Promise<{ database: string }>;
   close(): Promise<void>;
 }
@@ -92,6 +111,54 @@ export function createPgDatabase(config: Config): Database {
     return result.rows[0] ?? null;
   }
 
+  /**
+   * Fuzzy city typeahead backed by the `nar_cities` materialized view (distinct
+   * CSD/province pairs with address counts). The view is tiny relative to the
+   * 17M-row base table, and its trigram index makes the `ILIKE` fast. Prefix
+   * matches are ranked above interior matches, then by how many addresses the
+   * city has so the biggest, most-likely cities surface first.
+   */
+  async function listCities(query: ListCitiesQuery): Promise<CityRecord[]> {
+    if (query.province) {
+      const sql = `
+        SELECT city, province, address_count AS count
+        FROM nar_cities
+        WHERE province = $2 AND city ILIKE '%' || $1 || '%'
+        ORDER BY (lower(city) LIKE lower($1) || '%') DESC, address_count DESC, city
+        LIMIT $3
+      `;
+      const result = await pool.query<{ city: string; province: string; count: string }>(
+        sql,
+        [query.q, query.province, query.limit],
+      );
+      return result.rows.map((row) => ({
+        city: row.city,
+        province: row.province,
+        addressCount: Number(row.count),
+      }));
+    }
+
+    // No province filter: collapse the same city name across provinces into one
+    // national suggestion so the list is not cluttered with duplicates.
+    const sql = `
+      SELECT city, sum(address_count) AS count
+      FROM nar_cities
+      WHERE city ILIKE '%' || $1 || '%'
+      GROUP BY city
+      ORDER BY (lower(city) LIKE lower($1) || '%') DESC, sum(address_count) DESC, city
+      LIMIT $2
+    `;
+    const result = await pool.query<{ city: string; count: string }>(sql, [
+      query.q,
+      query.limit,
+    ]);
+    return result.rows.map((row) => ({
+      city: row.city,
+      province: null,
+      addressCount: Number(row.count),
+    }));
+  }
+
   async function ping(): Promise<{ database: string }> {
     const result = await pool.query<{ database: string }>(
       "SELECT current_database() AS database",
@@ -103,5 +170,5 @@ export function createPgDatabase(config: Config): Database {
     await pool.end();
   }
 
-  return { randomAddress, ping, close };
+  return { randomAddress, listCities, ping, close };
 }
