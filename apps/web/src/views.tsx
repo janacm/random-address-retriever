@@ -29,17 +29,6 @@ const API_ACCESS_FIELDS: NetlifyFieldDef[] = [
     placeholder: "Acme Inc.",
   },
   {
-    name: "interest",
-    label: "What do you need?",
-    type: "select",
-    options: [
-      "API access — free tier",
-      "API access — high volume / paid",
-      "This, but for another country",
-      "Something else",
-    ],
-  },
-  {
     name: "message",
     label: "Tell us about your use case",
     type: "textarea",
@@ -49,12 +38,6 @@ const API_ACCESS_FIELDS: NetlifyFieldDef[] = [
 ];
 
 const FEEDBACK_FIELDS: NetlifyFieldDef[] = [
-  {
-    name: "type",
-    label: "Type",
-    type: "select",
-    options: ["Feature request", "Bug / error", "Data issue", "Other"],
-  },
   {
     name: "email",
     label: "Email (optional, if you'd like a reply)",

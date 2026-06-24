@@ -650,7 +650,10 @@ button:disabled {
   pointer-events: none;
 }
 
-.comboInput {
+/* Scoped under .comboInputWrap so this wins over the more specific
+   `.field input` reset, which would otherwise drop the left padding that
+   reserves space for the search icon. */
+.comboInputWrap .comboInput {
   width: 100%;
   height: 44px;
   border: 1px solid #c7d0cb;
