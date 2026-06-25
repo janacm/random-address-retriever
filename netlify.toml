@@ -12,6 +12,10 @@
 # Optional (only if Cloudflare Access is enabled in front of the tunnel):
 #   CF_ACCESS_CLIENT_ID
 #   CF_ACCESS_CLIENT_SECRET
+# Optional (PostHog source-map upload — enables de-minified prod stack traces):
+#   POSTHOG_API_KEY      Personal API key with error-tracking:write scope
+#   POSTHOG_PROJECT_ID   Numeric project ID from PostHog project settings
+#   POSTHOG_HOST         e.g. https://us.i.posthog.com (defaults to us)
 
 [build]
   # The repo now commits pnpm-lock.yaml (v9, pnpm 9.14.4). Use corepack to install

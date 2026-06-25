@@ -1,6 +1,32 @@
 import path from "node:path";
 import react from "@vitejs/plugin-react";
+import posthog from "@posthog/rollup-plugin";
 import { defineConfig, type Plugin } from "vite";
+
+/**
+ * PostHog source-map upload plugin. Only enabled when the PostHog upload env
+ * vars are present (CI/production builds), so local dev builds don't attempt
+ * network uploads and never need a personal API key. Generates source maps,
+ * injects chunk metadata, uploads them to PostHog, then deletes the local
+ * `.map` files so they aren't shipped to the CDN.
+ */
+function posthogPlugin(): Plugin {
+  const apiKey = process.env.POSTHOG_API_KEY;
+  const projectId = process.env.POSTHOG_PROJECT_ID;
+  if (!apiKey || !projectId) {
+    return { name: "posthog-noop" };
+  }
+  return posthog({
+    personalApiKey: apiKey,
+    projectId,
+    host: process.env.POSTHOG_HOST,
+    sourcemaps: {
+      enabled: true,
+      releaseName: "random-address-web",
+      deleteAfterUpload: true,
+    },
+  }) as Plugin;
+}
 
 /**
  * Dev-only emulation of Netlify Forms. In production, Netlify's CDN intercepts
@@ -53,7 +79,7 @@ function netlifyFormsDevPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), netlifyFormsDevPlugin()],
+  plugins: [react(), netlifyFormsDevPlugin(), posthogPlugin()].filter(Boolean),
   server: {
     port: 5173,
     fs: {
