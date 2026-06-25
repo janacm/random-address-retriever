@@ -8,6 +8,7 @@ import {
   Shuffle,
 } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
+import { usePostHog } from "@posthog/react";
 import { AddressApiError, fetchRandomAddress } from "./api";
 import { CityCombobox } from "./components/CityCombobox";
 import type { View } from "./nav";
@@ -80,6 +81,7 @@ function getErrorMessage(error: unknown) {
 }
 
 export function App() {
+  const posthog = usePostHog();
   const [view, setView] = useState<View>("retriever");
   const [city, setCity] = useState("Burlington");
   const [province, setProvince] = useState<ProvinceCode | "">("ON");
@@ -111,9 +113,23 @@ export function App() {
       });
       setResult(response);
       setRequestState("success");
+      posthog?.capture("address_retrieved", {
+        city: response.data.city,
+        province: response.data.province,
+        postal_code: response.data.postalCode,
+        verbose,
+        query_duration_ms: response.meta.durationMs,
+      });
     } catch (error) {
       setRequestState("error");
-      setMessage(getErrorMessage(error));
+      const errorMessage = getErrorMessage(error);
+      setMessage(errorMessage);
+      posthog?.capture("address_retrieval_failed", {
+        city: city.trim() || "Burlington",
+        province,
+        error_message: errorMessage,
+        error_status: error instanceof AddressApiError ? error.status : undefined,
+      });
     }
   }
 
@@ -129,6 +145,11 @@ export function App() {
 
     await navigator.clipboard.writeText(formatAddressForClipboard(result));
     setMessage("Address copied.");
+    posthog?.capture("address_copied", {
+      city: result.data.city,
+      province: result.data.province,
+      postal_code: result.data.postalCode,
+    });
   }
 
   return (

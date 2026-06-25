@@ -17,6 +17,7 @@ interface NetlifyFormProps {
   submitLabel: string;
   successTitle: string;
   successMessage: string;
+  onSubmitSuccess?: () => void;
 }
 
 function encode(data: Record<string, string>): string {
@@ -49,6 +50,7 @@ export function NetlifyForm({
   submitLabel,
   successTitle,
   successMessage,
+  onSubmitSuccess,
 }: NetlifyFormProps) {
   const [values, setValues] = useState<Record<string, string>>(() =>
     initialValues(fields)
@@ -77,6 +79,7 @@ export function NetlifyForm({
       }
 
       setStatus("success");
+      onSubmitSuccess?.();
     } catch (submitError) {
       setStatus("error");
       setError(

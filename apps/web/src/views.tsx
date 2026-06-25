@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { usePostHog } from "@posthog/react";
 import {
   Activity,
   Bug,
@@ -54,6 +55,8 @@ const FEEDBACK_FIELDS: NetlifyFieldDef[] = [
 ];
 
 export function ApiAccessView() {
+  const posthog = usePostHog();
+
   return (
     <section className="page apiPage" aria-label="API access">
       <div className="pageIntro">
@@ -108,6 +111,7 @@ export function ApiAccessView() {
           submitLabel="Request access"
           successTitle="Thanks — we got it."
           successMessage="We'll be in touch at the email you provided. No spam."
+          onSubmitSuccess={() => posthog?.capture("api_access_requested")}
         />
       </div>
     </section>
@@ -176,6 +180,8 @@ function HealthCard() {
 }
 
 export function AboutView() {
+  const posthog = usePostHog();
+
   return (
     <section className="page aboutPage" aria-label="About this tool">
       <div className="pageIntro">
@@ -250,6 +256,7 @@ export function AboutView() {
           submitLabel="Send feedback"
           successTitle="Thanks for the feedback!"
           successMessage="We read every submission and use it to prioritize what's next."
+          onSubmitSuccess={() => posthog?.capture("feedback_submitted")}
         />
       </div>
     </section>
