@@ -51,9 +51,36 @@ http://127.0.0.1:5173
 `pnpm install` installs all workspace packages (the API in `server/` and the web
 app in `apps/web/`), and `pnpm dev` starts both the API and the frontend.
 
-The API (`server/`) listens at `http://127.0.0.1:8787`. In dev mode, the API and
+The API (`server/`) listens at `http://*********:8787`. In dev mode, the API and
 frontend default to the bearer token `local-dev-token`. Set `ADDRESS_API_TOKEN`
 and `VITE_ADDRESS_API_TOKEN` to the same value if you override it.
+
+### PostHog analytics
+
+The web app sends product analytics to [PostHog](https://posthog.com). All keys
+are optional — when unset, analytics simply no-ops, so local dev works without
+any PostHog account.
+
+Client-side variables are read by the browser bundle (Vite requires the `VITE_`
+prefix) and can be set in `apps/web/.env.local`:
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `VITE_POSTHOG_PROJECT_TOKEN` | No | Public project token (`phc_...`) used to send events from the browser. Leave unset to disable analytics. |
+| `VITE_POSTHOG_HOST` | No | PostHog ingestion host. Defaults to `https://us.i.posthog.com`. |
+
+Build-time variables enable PostHog **source-map upload** so production stack
+traces de-minify in PostHog error tracking. They must **not** use the `VITE_`
+prefix (they are never bundled into the browser) and are set on the build
+runner — for this project, in the Netlify site's environment variables. The
+upload step only runs when both `POSTHOG_API_KEY` and `POSTHOG_PROJECT_ID` are
+present, so local and PR builds skip it automatically:
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `POSTHOG_API_KEY` | For upload | Personal API key with the `error-tracking:write` scope. |
+| `POSTHOG_PROJECT_ID` | For upload | Numeric project ID from PostHog project settings. |
+| `POSTHOG_HOST` | No | PostHog host for the upload. Defaults to `https://us.i.posthog.com`. |
 
 The random pick uses an index-only scan over a covering index (`Heap Fetches:
 0`), which keeps it fast and uniform without sampling (~20 ms warm). The shell
