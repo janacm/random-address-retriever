@@ -3,6 +3,7 @@ import {
   Database,
   ExternalLink,
   MapPin,
+  MapPinOff,
   RefreshCw,
   Search,
   Shuffle,
@@ -68,16 +69,46 @@ function googleMapsUrl(result: RandomAddressResponse): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
-function getErrorMessage(error: unknown) {
+type ErrorInfo = { title: string; message: string };
+
+// Map any thrown error to a user-facing title + actionable message. The 404 case
+// is the common one — a city that isn't in the index — so it names the query and
+// tells the user how to recover instead of leaving them guessing.
+function describeError(error: unknown, cityLabel: string): ErrorInfo {
   if (error instanceof AddressApiError) {
-    return error.message;
+    if (error.status === 404) {
+      return {
+        title: "No address found",
+        message: `We couldn't find any addresses for "${cityLabel}". Check the spelling, or pick a city from the suggestions as you type.`,
+      };
+    }
+    if (error.status === 400) {
+      return {
+        title: "Check your search",
+        message:
+          error.message ||
+          "That search wasn't valid. Adjust the city or province and try again.",
+      };
+    }
+    if (error.status === 429) {
+      return {
+        title: "Too many requests",
+        message:
+          "You've made a lot of requests in a short time. Wait a moment, then try again.",
+      };
+    }
+    return {
+      title: "Something went wrong",
+      message:
+        error.message ||
+        "The address service returned an unexpected error. Please try again.",
+    };
   }
 
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return "Unexpected request failure.";
+  return {
+    title: "Couldn't reach the service",
+    message: "We couldn't reach the address service. Check your connection and try again.",
+  };
 }
 
 export function App() {
@@ -87,7 +118,10 @@ export function App() {
   const [province, setProvince] = useState<ProvinceCode | "">("ON");
   const [verbose, setVerbose] = useState(false);
   const [requestState, setRequestState] = useState<RequestState>("idle");
-  const [message, setMessage] = useState("");
+  const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
+  const [notice, setNotice] = useState<{ text: string; tone: "ok" | "error" } | null>(
+    null
+  );
   const [result, setResult] = useState<RandomAddressResponse | null>(null);
 
   const selectedProvince = useMemo(
@@ -102,12 +136,16 @@ export function App() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const submittedCity = city.trim() || "Burlington";
+    const cityLabel = province ? `${submittedCity}, ${province}` : submittedCity;
+
     setRequestState("loading");
-    setMessage("");
+    setNotice(null);
+    setErrorInfo(null);
 
     try {
       const response = await fetchRandomAddress({
-        city: city.trim() || "Burlington",
+        city: submittedCity,
         province,
         verbose,
       });
@@ -121,13 +159,16 @@ export function App() {
         query_duration_ms: response.meta.durationMs,
       });
     } catch (error) {
+      // Drop any stale result so a prior address can't be mistaken for the new
+      // one, and surface a clear error state in its place.
+      setResult(null);
       setRequestState("error");
-      const errorMessage = getErrorMessage(error);
-      setMessage(errorMessage);
+      const info = describeError(error, cityLabel);
+      setErrorInfo(info);
       posthog?.capture("address_retrieval_failed", {
-        city: city.trim() || "Burlington",
+        city: submittedCity,
         province,
-        error_message: errorMessage,
+        error_message: error instanceof Error ? error.message : info.message,
         error_status: error instanceof AddressApiError ? error.status : undefined,
       });
     }
@@ -143,13 +184,22 @@ export function App() {
       return;
     }
 
-    await navigator.clipboard.writeText(formatAddressForClipboard(result));
-    setMessage("Address copied.");
-    posthog?.capture("address_copied", {
-      city: result.data.city,
-      province: result.data.province,
-      postal_code: result.data.postalCode,
-    });
+    // clipboard.writeText rejects in insecure contexts or when the permission is
+    // denied, so guard it and tell the user what to do instead of failing silently.
+    try {
+      await navigator.clipboard.writeText(formatAddressForClipboard(result));
+      setNotice({ text: "Address copied.", tone: "ok" });
+      posthog?.capture("address_copied", {
+        city: result.data.city,
+        province: result.data.province,
+        postal_code: result.data.postalCode,
+      });
+    } catch {
+      setNotice({
+        text: "Couldn't copy automatically — select the address above and copy it manually.",
+        tone: "error",
+      });
+    }
   }
 
   return (
@@ -311,7 +361,21 @@ export function App() {
                   </div>
                 </div>
 
-                {result ? (
+                {requestState === "error" && errorInfo ? (
+                  <div className="errorState">
+                    <MapPinOff aria-hidden="true" size={32} />
+                    <p>{errorInfo.title}</p>
+                    <span>{errorInfo.message}</span>
+                    <button
+                      type="button"
+                      className="secondaryButton errorRetry"
+                      onClick={handleRefresh}
+                    >
+                      <RefreshCw aria-hidden="true" size={16} />
+                      <span>Try again</span>
+                    </button>
+                  </div>
+                ) : result ? (
                   <div className="resultContent">
                     <div className="addressBlock">
                       <MapPin aria-hidden="true" size={22} />
@@ -377,13 +441,13 @@ export function App() {
                   </div>
                 )}
 
-                {message ? (
+                {notice ? (
                   <p
                     className={
-                      requestState === "error" ? "statusMessage error" : "statusMessage"
+                      notice.tone === "error" ? "statusMessage error" : "statusMessage"
                     }
                   >
-                    {message}
+                    {notice.text}
                   </p>
                 ) : null}
               </section>

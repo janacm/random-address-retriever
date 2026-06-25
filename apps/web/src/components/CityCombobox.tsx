@@ -29,6 +29,12 @@ export function CityCombobox({
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [justSelected, setJustSelected] = useState(false);
+  // "empty" means the lookup succeeded but matched no city — distinct from
+  // "idle" (too short / endpoint unavailable), so we never claim "no cities
+  // found" when the request itself failed.
+  const [status, setStatus] = useState<"idle" | "loading" | "empty" | "results">(
+    "idle"
+  );
   const listboxId = useId();
 
   useEffect(() => {
@@ -42,21 +48,27 @@ export function CityCombobox({
     if (term.length < 2) {
       setSuggestions([]);
       setActiveIndex(-1);
+      setStatus("idle");
       return;
     }
 
     const controller = new AbortController();
     const handle = window.setTimeout(() => {
+      setStatus("loading");
       fetchCities(term, province, controller.signal)
         .then((results) => {
           if (!controller.signal.aborted) {
             setSuggestions(results);
             setActiveIndex(-1);
+            setStatus(results.length > 0 ? "results" : "empty");
           }
         })
         .catch(() => {
           if (!controller.signal.aborted) {
+            // Degrade gracefully: keep the field usable as plain text and show
+            // no dropdown rather than a misleading "no cities found".
             setSuggestions([]);
+            setStatus("idle");
           }
         });
     }, 180);
@@ -73,6 +85,7 @@ export function CityCombobox({
     setOpen(false);
     setSuggestions([]);
     setActiveIndex(-1);
+    setStatus("idle");
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -96,7 +109,14 @@ export function CityCombobox({
     }
   }
 
-  const showList = open && suggestions.length > 0;
+  const term = value.trim();
+  const hasQuery = term.length >= 2;
+  // Show the dropdown for real suggestions, while a fetch is in flight (when we
+  // have nothing to show yet), or to report that nothing matched.
+  const showLoading = status === "loading" && suggestions.length === 0;
+  const showEmpty = status === "empty";
+  const showList =
+    open && hasQuery && (suggestions.length > 0 || showLoading || showEmpty);
 
   return (
     <div className="combo">
@@ -118,7 +138,7 @@ export function CityCombobox({
             onChange(event.target.value);
           }}
           onFocus={() => {
-            if (suggestions.length > 0) {
+            if (suggestions.length > 0 || status === "empty") {
               setOpen(true);
             }
           }}
@@ -129,6 +149,16 @@ export function CityCombobox({
 
       {showList ? (
         <ul className="comboList" id={listboxId} role="listbox">
+          {showLoading ? (
+            <li className="comboStatusRow" role="presentation">
+              Searching…
+            </li>
+          ) : null}
+          {showEmpty ? (
+            <li className="comboStatusRow" role="presentation">
+              No cities found for “{term}”.
+            </li>
+          ) : null}
           {suggestions.map((suggestion, index) => (
             <li
               key={`${suggestion.city}-${suggestion.province ?? "all"}`}
