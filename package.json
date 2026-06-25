@@ -11,5 +11,11 @@
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "typecheck": "pnpm -r run typecheck"
+  },
+  "pnpm": {
+    "overrides": {
+      "vitest>vite": "6.4.3",
+      "tsup>esbuild": "0.28.1"
+    }
   }
 }
