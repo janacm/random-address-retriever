@@ -1034,6 +1034,37 @@ button:disabled {
   line-height: 1.55;
 }
 
+.footerAttribution {
+  margin: 0;
+  max-width: 80ch;
+  color: #7a857d;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.footerAttribution a {
+  color: #45554c;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.footerAttribution a:hover {
+  color: #b21e14;
+}
+
+.attributionNote {
+  margin-top: 10px !important;
+  color: #5d6b62 !important;
+  font-size: 0.85rem !important;
+  line-height: 1.55;
+}
+
+.attributionNote a {
+  color: #b21e14;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 .footerLinks {
   display: flex;
   flex-wrap: wrap;

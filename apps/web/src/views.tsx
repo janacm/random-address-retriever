@@ -192,6 +192,27 @@ export function AboutView() {
           officially associated with Statistics Canada or any Government of Canada
           department.
         </p>
+        <p className="attributionNote">
+          Adapted from Statistics Canada, National Address Register. This does not
+          constitute an endorsement by Statistics Canada of this product. The register
+          is available under the{" "}
+          <a
+            href="https://www.statcan.gc.ca/en/reference/licence"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Statistics Canada Open Licence
+          </a>{" "}
+          and contains information licensed under the{" "}
+          <a
+            href="https://open.yukon.ca/open-government-licence-yukon"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open Government Licence – Yukon
+          </a>
+          .
+        </p>
       </div>
 
       <div className="aboutGrid">
@@ -257,9 +278,12 @@ export function TermsView({ onNavigate }: { onNavigate: (view: View) => void }) 
         </p>
         <h3>Data &amp; accuracy</h3>
         <p>
-          Addresses are derived from the publicly available National Address Register.
-          They may be incomplete, outdated, or otherwise inaccurate and should not be
-          relied upon for any official, legal, or emergency purpose.
+          Addresses are adapted from Statistics Canada&rsquo;s National Address
+          Register, available under the Statistics Canada Open Licence and containing
+          information licensed under the Open Government Licence – Yukon. This does not
+          constitute an endorsement by Statistics Canada of the Service. The data may be
+          incomplete, outdated, or otherwise inaccurate and should not be relied upon for
+          any official, legal, or emergency purpose.
         </p>
         <h3>No affiliation</h3>
         <p>
@@ -339,6 +363,27 @@ export function SiteFooter({ onNavigate }: { onNavigate: (view: View) => void })
           officially associated with Statistics Canada or any Government of Canada
           department. Address data is derived from the publicly available National
           Address Register.
+        </p>
+        <p className="footerAttribution">
+          Adapted from Statistics Canada, National Address Register. This does not
+          constitute an endorsement by Statistics Canada of this product. Available
+          under the{" "}
+          <a
+            href="https://www.statcan.gc.ca/en/reference/licence"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Statistics Canada Open Licence
+          </a>
+          ; contains information licensed under the{" "}
+          <a
+            href="https://open.yukon.ca/open-government-licence-yukon"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open Government Licence – Yukon
+          </a>
+          .
         </p>
         <nav className="footerLinks" aria-label="Legal and contact">
           <button type="button" onClick={() => onNavigate("terms")}>

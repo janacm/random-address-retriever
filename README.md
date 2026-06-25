@@ -140,6 +140,31 @@ ORDER BY random()
 LIMIT 1;
 ```
 
+## Data Source and Licensing
+
+Address data is adapted from **Statistics Canada's National Address Register
+(NAR)**. The NAR is available free of charge under the
+[Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence)
+and contains information licensed under the
+[Open Government Licence – Yukon](https://open.yukon.ca/open-government-licence-yukon).
+
+When redistributing data or screenshots derived from the NAR, include the
+following attribution:
+
+> Adapted from Statistics Canada, National Address Register. This does not
+> constitute an endorsement by Statistics Canada of this product. Contains
+> information licensed under the Open Government Licence – Yukon.
+
+This project is independent and is **not** affiliated with, endorsed by, or
+officially associated with Statistics Canada or any Government of Canada
+department. The raw NAR datasets (`/Addresses/`, `/ca/`) are large local
+artifacts and are intentionally excluded from version control (see
+`.gitignore`).
+
+When deploying publicly, surface this attribution in the UI, keep the Terms of
+Service and Privacy Policy reachable, and retain bearer-token auth plus rate
+limiting on any exposed endpoint.
+
 ## Project Docs
 
 - [Data source decision](DATA_SOURCE_DECISION.md)
