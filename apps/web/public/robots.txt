@@ -1,0 +1,16 @@
+# robots.txt for Random Address Retriever
+# Public tool — crawling and AI indexing are welcome.
+#
+# NOTE: the canonical host below is an assumption (matches the address-api.janac.me
+# zone). If the real deployed domain differs, update the Sitemap line here and the
+# URLs in sitemap.xml and llms.txt.
+
+User-agent: *
+Allow: /
+
+# The JSON API is rate-limited and token-gated; it is documented for agents in
+# llms.txt rather than crawled. Keep bots out of it.
+Disallow: /api/
+Disallow: /healthz
+
+Sitemap: https://randomaddress.janac.me/sitemap.xml
