@@ -17,5 +17,9 @@
       "vitest>vite": "6.4.3",
       "tsup>esbuild": "0.28.1"
     }
+  },
+  "devDependencies": {
+    "@neon/config": "^1.7.3",
+    "@neon/env": "^1.4.4"
   }
 }
