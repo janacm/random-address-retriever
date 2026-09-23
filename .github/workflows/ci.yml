@@ -47,7 +47,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Typecheck
-        run: pnpm --filter random-address-api run typecheck
+        run: pnpm --filter random-address-api run typecheck && pnpm --filter @random-address/web exec tsc --noEmit
 
       - name: Build
         run: pnpm --filter random-address-api run build
@@ -56,9 +56,12 @@ jobs:
         working-directory: server
         run: psql "postgresql://postgres:postgres@127.0.0.1:5432/random_address_retriever" -v ON_ERROR_STOP=1 -f test/fixtures/seed.sql
 
-      - name: Test (unit + integration)
-        run: pnpm --filter random-address-api run test
+      - name: Test (unit + integration, coverage >= 80%)
+        run: pnpm --filter random-address-api run test:coverage
         env:
           RUN_DB_TESTS: "1"
           TEST_CITY: Burlington
           TEST_PROVINCE: ON
+
+      - name: Web unit tests (coverage >= 80%)
+        run: pnpm --filter @random-address/web run test:coverage

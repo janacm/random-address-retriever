@@ -169,6 +169,35 @@ describe("GET /api/random-address", () => {
     });
   });
 
+  it("returns a 400 envelope when the querystring fails schema validation", async () => {
+    app = buildApp({ db: fakeDb(), config });
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/random-address?city=Burlington&city=Toronto",
+      headers: authHeader,
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error.code).toBe("bad_request");
+  });
+
+  it("passes through a 4xx status set on a thrown error", async () => {
+    app = buildApp({
+      db: fakeDb({
+        randomAddress: async () => {
+          throw Object.assign(new Error("Teapot."), { statusCode: 418 });
+        },
+      }),
+      config,
+    });
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/random-address?city=Burlington",
+      headers: authHeader,
+    });
+    expect(res.statusCode).toBe(418);
+    expect(res.json()).toEqual({ error: { code: "bad_request", message: "Teapot." } });
+  });
+
   it("serializes a null postalCode rather than dropping it", async () => {
     app = buildApp({
       db: fakeDb({ randomAddress: async () => ({ ...sample, postal_code: null }) }),

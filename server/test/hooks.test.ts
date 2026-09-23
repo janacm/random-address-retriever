@@ -35,6 +35,18 @@ describe("makeRateLimitHook", () => {
     now += 2_000;
     expect((await app.inject({ method: "GET", url: "/x" })).statusCode).toBe(200);
   });
+  it("keys buckets by the first X-Forwarded-For address", async () => {
+    app = Fastify();
+    app.addHook("onRequest", makeRateLimitHook({ windowMs: 60_000, max: 1, now: () => 1000 }));
+    app.get("/x", async () => ({ ok: true }));
+
+    const from = (ip: string) =>
+      app.inject({ method: "GET", url: "/x", headers: { "x-forwarded-for": ip } });
+
+    expect((await from("203.0.113.1, 10.0.0.1")).statusCode).toBe(200);
+    expect((await from("203.0.113.1")).statusCode).toBe(429);
+    expect((await from("198.51.100.7, 10.0.0.1")).statusCode).toBe(200);
+  });
 });
 
 describe("makeCorsHook", () => {
