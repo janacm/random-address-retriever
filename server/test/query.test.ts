@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { parseAddressQuery, toAddressPayload } from "../src/query";
+import {
+  MAX_CITY_RESULTS,
+  parseAddressQuery,
+  parseCitiesQuery,
+  toAddressPayload,
+} from "../src/query";
 import { ValidationError } from "../src/errors";
 import type { AddressRecord } from "../src/db";
 
@@ -70,5 +75,51 @@ describe("toAddressPayload", () => {
       locGuid: "loc-1",
       addrGuid: "addr-1",
     });
+  });
+});
+
+describe("parseCitiesQuery", () => {
+  it("trims the term, upper-cases the province, and parses the limit", () => {
+    expect(parseCitiesQuery({ q: "  burl ", province: " on ", limit: "5" })).toEqual({
+      q: "burl",
+      province: "ON",
+      limit: 5,
+    });
+  });
+
+  it("defaults the province to null and the limit to the maximum", () => {
+    expect(parseCitiesQuery({ q: "to" })).toEqual({
+      q: "to",
+      province: null,
+      limit: MAX_CITY_RESULTS,
+    });
+  });
+
+  it("caps the limit at the maximum", () => {
+    expect(parseCitiesQuery({ q: "to", limit: "500" }).limit).toBe(MAX_CITY_RESULTS);
+  });
+
+  it.each(["0", "-3", "abc", ""])("falls back to the maximum for limit=%j", (limit) => {
+    expect(parseCitiesQuery({ q: "to", limit }).limit).toBe(MAX_CITY_RESULTS);
+  });
+
+  it("rejects a missing or one-character term", () => {
+    expect(() => parseCitiesQuery({})).toThrow(ValidationError);
+    expect(() => parseCitiesQuery({ q: " b " })).toThrow("at least 2 characters");
+  });
+
+  it("rejects an over-long term", () => {
+    expect(() => parseCitiesQuery({ q: "x".repeat(101) })).toThrow("100 characters or fewer");
+  });
+
+  it("rejects an unknown province with allowedValues in details", () => {
+    try {
+      parseCitiesQuery({ q: "to", province: "XX" });
+      expect.unreachable();
+    } catch (error) {
+      expect(error).toBeInstanceOf(ValidationError);
+      expect((error as ValidationError).details).toMatchObject({ field: "province" });
+      expect((error as ValidationError).details.allowedValues).toContain("ON");
+    }
   });
 });

@@ -126,6 +126,9 @@ By default, `random-address.sh` prints the formatted address, city, province, an
 postal code. Use `--verbose` when you also need the source `loc_guid` and
 `addr_guid`.
 
+To host a free-tier-sized copy (about 3M sampled rows, 350 MB), see
+[Hosted sample database](docs/HOSTED-SAMPLE.md).
+
 ## Local API
 
 The API is a strongly-typed [Fastify](https://fastify.dev) + TypeScript service

@@ -2,6 +2,7 @@
 -- Mirrors the columns the API touches (see ../../sql/schema.sql for the full
 -- production schema) and inserts a handful of rows the live-db tests expect.
 
+DROP MATERIALIZED VIEW IF EXISTS nar_cities;
 DROP TABLE IF EXISTS nar_addresses;
 
 CREATE TABLE nar_addresses (
@@ -44,3 +45,17 @@ VALUES
      'Toronto', 'ON', 'M1M1A1');
 
 ANALYZE nar_addresses;
+
+-- City typeahead source, same definition as sql/schema.sql. The trigram index
+-- is omitted: the ILIKE queries are correct without it, and the fixture stays
+-- free of extensions.
+CREATE MATERIALIZED VIEW nar_cities AS
+    SELECT csd_eng_name AS city,
+           mail_prov_abvn AS province,
+           count(*) AS address_count
+    FROM nar_addresses
+    WHERE csd_eng_name IS NOT NULL AND csd_eng_name <> ''
+    GROUP BY csd_eng_name, mail_prov_abvn;
+
+CREATE UNIQUE INDEX nar_cities_city_prov_idx
+    ON nar_cities (city, province);

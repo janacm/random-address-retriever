@@ -24,7 +24,7 @@
   publish = "apps/web/dist"
 
 [build.environment]
-  NODE_VERSION = "22"
+  NODE_VERSION = "24"
 
 # Edge functions run before redirects, so these intercept API calls and
 # terminate (return a Response) before the SPA fallback below is considered.

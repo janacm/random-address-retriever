@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useId, useState } from "react";
+import { KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { fetchCities } from "../api";
 import type { CitySuggestion, ProvinceCode } from "../types";
@@ -28,13 +28,15 @@ export function CityCombobox({
   const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [justSelected, setJustSelected] = useState(false);
+  // A ref, not state: resetting a state flag is itself a dependency change,
+  // which re-ran the effect and fetched suggestions for the chosen city.
+  const justSelected = useRef(false);
   const listboxId = useId();
 
   useEffect(() => {
     // Skip the fetch triggered by programmatically setting the value on select.
-    if (justSelected) {
-      setJustSelected(false);
+    if (justSelected.current) {
+      justSelected.current = false;
       return;
     }
 
@@ -65,10 +67,12 @@ export function CityCombobox({
       controller.abort();
       window.clearTimeout(handle);
     };
-  }, [value, province, justSelected]);
+  }, [value, province]);
 
   function selectSuggestion(suggestion: CitySuggestion) {
-    setJustSelected(true);
+    // Only when the value changes: an unchanged value never re-runs the effect,
+    // so the flag would linger and swallow the next real keystroke's lookup.
+    justSelected.current = suggestion.city !== value;
     onChange(suggestion.city);
     setOpen(false);
     setSuggestions([]);
