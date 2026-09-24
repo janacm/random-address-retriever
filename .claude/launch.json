@@ -4,7 +4,20 @@
     {
       "name": "dev",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev"],
+      "runtimeArgs": [
+        "dev"
+      ],
+      "port": 5173,
+      "url": "http://127.0.0.1:5173"
+    },
+    {
+      "name": "facts-pr",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "/Users/j.meenachisundaram/Documents/GitHub/random-address-retriever/.claude/worktrees/wf_c8b8c319-e48-7",
+        "dev"
+      ],
       "port": 5173,
       "url": "http://127.0.0.1:5173"
     }

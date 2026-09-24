@@ -38,3 +38,6 @@ node_modules/
 .neon
 /server/coverage/
 /apps/*/coverage/
+
+# Claude Code agent worktrees (per-machine scratch checkouts).
+/.claude/worktrees/
