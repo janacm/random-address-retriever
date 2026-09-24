@@ -129,6 +129,26 @@ postal code. Use `--verbose` when you also need the source `loc_guid` and
 To host a free-tier-sized copy (about 3M sampled rows, 350 MB), see
 [Hosted sample database](docs/HOSTED-SAMPLE.md).
 
+### Facts page
+
+The web app's Facts page (municipality sizes, ties for smallest, street and
+building extremes) reads `apps/web/src/facts.generated.json`, which is
+committed. It is computed from the full local import, not the hosted sample,
+so it only needs regenerating after a new NAR release is imported:
+
+```bash
+./scripts/db-start.sh
+./scripts/facts-build.sh   # NAR_ZIP defaults to tmp/nar-202507.zip
+```
+
+The script only reads the database (its SQL, `sql/facts.sql`, works in temp
+tables) and takes about five minutes. It needs the release zip because the
+`Locations/*.csv` files carry each building's census subdivision code and
+coordinates, which `nar_addresses` does not. Output is deterministic, and the
+script fails if new data contradicts a claim the page states in words (for
+example, that the smallest municipality is a tie), so the copy gets updated
+rather than going stale.
+
 ## Local API
 
 The API is a strongly-typed [Fastify](https://fastify.dev) + TypeScript service

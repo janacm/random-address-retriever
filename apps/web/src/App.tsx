@@ -7,7 +7,7 @@ import {
   Search,
   Shuffle,
 } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, lazy, Suspense, useMemo, useState } from "react";
 import { usePostHog } from "@posthog/react";
 import { AddressApiError, fetchRandomAddress } from "./api";
 import { CityCombobox } from "./components/CityCombobox";
@@ -38,8 +38,13 @@ const PROVINCES: Array<{ code: ProvinceCode | ""; name: string }> = [
   { code: "YT", name: "Yukon" },
 ];
 
+// The Facts page and its generated data add about 75 KB of JS (21 KB gzipped),
+// so they load on the first visit to the page instead of in the main bundle.
+const FactsView = lazy(() => import("./FactsView").then((m) => ({ default: m.FactsView })));
+
 const NAV: Array<{ key: View; label: string }> = [
   { key: "retriever", label: "Retriever" },
+  { key: "facts", label: "Facts" },
   { key: "api", label: "API access" },
   { key: "about", label: "About" },
 ];
@@ -391,6 +396,18 @@ export function App() {
           </>
         ) : null}
 
+        {view === "facts" ? (
+          <Suspense
+            fallback={
+              <section className="page" aria-label="Facts" aria-busy="true">
+                <p className="eyebrow">Facts</p>
+                <p>Loading facts…</p>
+              </section>
+            }
+          >
+            <FactsView />
+          </Suspense>
+        ) : null}
         {view === "api" ? <ApiAccessView /> : null}
         {view === "about" ? <AboutView /> : null}
         {view === "terms" ? <TermsView onNavigate={setView} /> : null}
