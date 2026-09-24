@@ -352,7 +352,7 @@ SELECT 'halfOfAddresses', json_build_object(
         'municipalities', bottom.k,
         'addresses', bottom.s,
         'pct', round(100.0 * bottom.s / t.tot, 2),
-        -- differ, so no tie straddles the cut
+        -- the claim block checks these differ, so no tie straddles the cut
         'largestIncluded', (SELECT n FROM c WHERE rn = t.m - t.m / 2 + 1),
         'smallestExcluded', (SELECT n FROM c WHERE rn = t.m - t.m / 2)),
     'smallestLargerThanBottomHalf', (
@@ -1215,6 +1215,23 @@ BEGIN
         failed := array_append(failed, 'Principale vs Main by buildings changed');
     END IF;
 
+    SELECT v INTO j FROM claim WHERE key = 'halfOfAddresses';
+    IF (j->'bottomHalf'->>'largestIncluded')::int >= (j->'bottomHalf'->>'smallestExcluded')::int THEN
+        failed := array_append(failed, 'a tie now straddles the bottom-half cut');
+    END IF;
+
+    SELECT v INTO j FROM claim WHERE key = 'biggestTown';
+    IF 2 * (j->>'cityTypeSmaller')::int <= (j->>'cityTypeMunicipalities')::int THEN
+        failed := array_append(failed, 'the biggest town no longer has more addresses than most cities');
+    END IF;
+
+    SELECT v INTO j FROM claim WHERE key = 'houseDescriptions';
+    IF EXISTS (SELECT 1 FROM jsonb_array_elements(j->'longest') e
+               WHERE NOT (upper(e->>'label') LIKE '%TRIM%' OR upper(e->>'label') ~ 'FLOORS?\.'
+                          OR upper(e->>'label') ~ 'WINDOWS?\.')) THEN
+        failed := array_append(failed, 'the longest unit label no longer describes the house');
+    END IF;
+
     SELECT v INTO j FROM claim WHERE key = 'repeatedAddresses';
     IF (j->'top'->0->>'municipalities')::int = (j->'top'->1->>'municipalities')::int THEN
         failed := array_append(failed, 'the most repeated street address is now a tie');
@@ -1234,6 +1251,9 @@ BEGIN
     SELECT v INTO j FROM claim WHERE key = 'islands';
     IF j->>'example' IS NULL THEN
         failed := array_append(failed, 'the island example address no longer exists');
+    END IF;
+    IF j->'topMunicipalities'->0->>'municipality' IS DISTINCT FROM 'The Archipelago' THEN
+        failed := array_append(failed, 'the island example (The Archipelago) is no longer from the leading municipality');
     END IF;
     IF (j->>'ileQuebec')::int <> (j->>'ile')::int THEN
         failed := array_append(failed, 'ÎLE street types are no longer all in Quebec');

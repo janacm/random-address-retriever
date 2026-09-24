@@ -147,7 +147,9 @@ tables) and takes about five minutes. It needs the release zip because the
 coordinates, which `nar_addresses` does not. Output is deterministic, and the
 script fails if new data contradicts a claim the page states in words (for
 example, that the smallest municipality is a tie), so the copy gets updated
-rather than going stale.
+rather than going stale. `apps/web/src/FactsView.test.tsx` pins this release's
+rendered values (such as "Toronto (1,316,783)"), so update its expectations
+along with the regenerated JSON or CI will fail.
 
 ## Local API
 

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Database } from "lucide-react";
 import { FACTS } from "./facts";
 import {
@@ -421,10 +421,10 @@ function SizeSection() {
 
       <FactCard
         fact="nunavut-vs-la-sarre"
-        title={`All of Nunavut has fewer addresses than ${place(nu.nextLarger.name, nu.nextLarger.province)}`}
+        title={`The register has fewer addresses for all of Nunavut than for ${place(nu.nextLarger.name, nu.nextLarger.province)}`}
       >
         <p>
-          {`Nunavut has ${n(nu.addresses)} addresses in the register, in ${n(nu.communities.length)} communities: ${n(nuLargest.addresses)} in ${nuLargest.name} and as few as ${n(nuSmallest.addresses)} in ${nuSmallest.name}. That is ${n(nu.nextLarger.addresses - nu.addresses)} fewer than the single municipality of ${place(nu.nextLarger.name, nu.nextLarger.province)} (${n(nu.nextLarger.addresses)}), and ${n(nu.municipalitiesBigger)} municipalities are bigger than the whole territory.`}
+          {`The register covers ${n(nu.communities.length)} Nunavut communities, with ${n(nu.addresses)} addresses between them: ${n(nuLargest.addresses)} in ${nuLargest.name} and as few as ${n(nuSmallest.addresses)} in ${nuSmallest.name}. That is ${n(nu.nextLarger.addresses - nu.addresses)} fewer than the single municipality of ${place(nu.nextLarger.name, nu.nextLarger.province)} (${n(nu.nextLarger.addresses)}), and ${n(nu.municipalitiesBigger)} municipalities are bigger than the whole territory.`}
         </p>
       </FactCard>
 
@@ -767,7 +767,7 @@ function NumbersSection() {
 
       <FactCard fact="highest-civic-number" title={`The highest civic number is ${high.civic}`}>
         <p>
-          {`It is ${high.address}, in ${place(high.municipality, high.province)}. All ${n(high.sameStreetInMunicipality.addresses)} addresses on ${high.street} in ${high.municipality} are numbered between ${n(high.sameStreetInMunicipality.min)} and ${n(high.sameStreetInMunicipality.max)}. Nationally, ${n(high.sixDigit)} addresses have six-digit civic numbers${high.sevenPlusDigit === 0 ? " and none has seven" : ""}.`}
+          {`It is ${high.address}, in ${place(high.municipality, high.province)}. All ${n(high.sameStreetInMunicipality.addresses)} addresses on ${high.street} in ${high.municipality} are numbered between ${high.sameStreetInMunicipality.min} and ${high.sameStreetInMunicipality.max}. Nationally, ${n(high.sixDigit)} addresses have six-digit civic numbers${high.sevenPlusDigit === 0 ? " and none has seven" : ""}.`}
         </p>
       </FactCard>
 
@@ -855,6 +855,13 @@ function coordinate(value: number, positive: string, negative: string, digits: n
   return `${n(Math.abs(value), digits)}°${value >= 0 ? positive : negative}`;
 }
 
+/** "Fort Liard has one address in the register" or "Red Lake has 1 geocoded address out of 1,779". */
+function coverage(m: { municipality: string; municipalityAddresses: number; municipalityGeocoded: number }) {
+  return m.municipalityAddresses === 1
+    ? `${m.municipality} has one address in the register`
+    : `${m.municipality} has ${countOf(m.municipalityGeocoded, "geocoded address", "geocoded addresses")} out of ${n(m.municipalityAddresses)}`;
+}
+
 function GeographySection() {
   const ex = FACTS.extremes;
   const lat = FACTS.latitude;
@@ -910,18 +917,26 @@ function GeographySection() {
         </p>
       </FactCard>
 
-      <FactCard fact="loneliest-building" title={`The loneliest building is ${n(first.km, 1)} km from its nearest neighbour`}>
+      <FactCard
+        fact="loneliest-building"
+        title={`The register's loneliest geocoded building is ${n(first.km, 1)} km from its nearest neighbour`}
+      >
         <p>
-          {`${firstIntro} is ${n(first.km, 1)} km from the nearest other geocoded building in the register, ${first.nearest.address} in ${place(first.nearest.municipality, first.nearest.province)}. Next is ${second.address} in ${place(second.municipality, second.province)}, ${n(second.km, 1)} km from ${second.nearest.municipality}.`}
+          {`${firstIntro} is ${n(first.km, 1)} km from the nearest other geocoded building in the register, ${first.nearest.address} in ${place(first.nearest.municipality, first.nearest.province)}. Next is ${second.address} in ${place(second.municipality, second.province)}, ${n(second.km, 1)} km from ${second.nearest.municipality}${
+            third
+              ? `, then ${third.address} in ${place(third.municipality, third.province)}, ${n(third.km, 1)} km from ${third.nearest.municipality}`
+              : ""
+          }.`}
         </p>
-        {third ? (
-          <p className="factNote">
-            {`These distances measure the register's coverage as much as geography. Third place, ${place(third.municipality, third.province)}, has ${countOf(third.municipalityGeocoded, "geocoded address", "geocoded addresses")} out of ${n(third.municipalityAddresses)}, so it is left out.`}
-          </p>
-        ) : null}
+        <p className="factNote">
+          {`These distances measure the register's coverage as much as geography: ${joinList(
+            lone.top.map(coverage),
+            "; "
+          )}. Buildings the register leaves out or has no coordinates for can sit much closer.`}
+        </p>
       </FactCard>
 
-      <FactCard fact="latitude-bands" title={`${pct(lat.pctSouthOf49, 0)} of addresses lie south of the 49th parallel`}>
+      <FactCard fact="latitude-bands" title={`${pct(lat.pctSouthOf49, 0)} of geocoded addresses lie south of the 49th parallel`}>
         <p>
           {`${pct(lat.pctSouthOf49, 2)} of geocoded addresses (${n(lat.southOf49)} of ${n(lat.geocodedAddresses)}) are south of 49°N. Only ${n(lat.northOf60)} (${pct(lat.pctNorthOf60, 3)}) are at or north of 60°N. The median address latitude is ${coordinate(lat.medianLat, "N", "S", 4)}.`}
         </p>
@@ -986,6 +1001,15 @@ function MethodSection() {
 }
 
 export function FactsView() {
+  // The page is lazy-loaded, so the browser's own jump to a #facts-* anchor on
+  // load happens before the section exists. Redo it once the sections render.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (id.startsWith("facts-")) {
+      document.getElementById(id)?.scrollIntoView?.();
+    }
+  }, []);
+
   const d = FACTS.dataset;
   const tiny = FACTS.tinyMunicipalities;
   const mm = FACTS.meanMedian;
@@ -1006,7 +1030,7 @@ export function FactsView() {
         <div>
           <h3>Counted from the full register</h3>
           <p>
-            {`Every figure here comes from all ${n(d.addresses)} addresses. The live retriever on this site picks from a smaller sample of the register, so it holds fewer addresses per city than the counts here. ${n(d.addressesWithoutMunicipality)} addresses with no municipality are left out of the municipality counts.`}
+            {`Every figure here comes from all ${n(d.addresses)} addresses. The retriever may run on a smaller sample of the register, in which case it holds fewer addresses per city than the counts here. ${n(d.addressesWithoutMunicipality)} addresses with no municipality are left out of the municipality counts.`}
           </p>
         </div>
       </div>

@@ -70,13 +70,15 @@ function card(container: HTMLElement, fact: string) {
 }
 
 describe("FactsView", () => {
-  it("says the facts come from the full register, not the retriever's sample", () => {
+  it("says the facts come from the full register without claiming what the retriever runs on", () => {
     render(<FactsView />);
     expect(
       screen.getByRole("heading", { level: 2, name: "Facts from the National Address Register" })
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Counted from the full register" })).toBeInTheDocument();
-    expect(screen.getByText(/picks from a smaller sample of the register/)).toBeInTheDocument();
+    const callout = screen.getByText(/Every figure here comes from all 17,169,294 addresses/);
+    expect(callout).toHaveTextContent("The retriever may run on a smaller sample of the register");
+    expect(callout).not.toHaveTextContent(/live retriever on this site picks/);
   });
 
   it("leads with the key numbers", () => {
@@ -165,6 +167,54 @@ describe("FactsView", () => {
     );
   });
 
+  it("gives the coverage caveat for every loneliest building, not just one", () => {
+    const { container } = render(<FactsView />);
+    const lonely = card(container, "loneliest-building");
+    expect(lonely).toHaveTextContent("then 34 Gold Eagle AVE in Red Lake, ON, 118.6 km from Kenora, Unorganized.");
+    expect(lonely).toHaveTextContent(
+      "Fort Liard has one address in the register; Ivujivik has one address in the register and Red Lake has 1 geocoded address out of 1,779."
+    );
+    expect(lonely).not.toHaveTextContent("left out");
+  });
+
+  it("frames coverage-limited titles as facts about the register", () => {
+    render(<FactsView />);
+    expect(
+      screen.getByRole("heading", { name: "The register's loneliest geocoded building is 150.8 km from its nearest neighbour" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "The register has fewer addresses for all of Nunavut than for La Sarre, QC" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "70% of geocoded addresses lie south of the 49th parallel" })).toBeInTheDocument();
+  });
+
+  it("writes civic numbers without separators, as in an address", () => {
+    const { container } = render(<FactsView />);
+    expect(card(container, "highest-civic-number")).toHaveTextContent("numbered between 999008 and 999958");
+  });
+
+  it("names every census subdivision type it shows", () => {
+    const { container } = render(<FactsView />);
+    expect(card(container, "shared-names-across-provinces")).toHaveTextContent("PE (fire district, 63)");
+    // csdTypeWord/csdTypeLabel fall back to "(type XX, ..." and "a type XX"
+    expect(container.textContent).not.toMatch(/\(type [A-ZÉ-]+, |\ba type [A-ZÉ-]+\b/);
+  });
+
+  it("scrolls to the section in the URL hash once the lazy page mounts", () => {
+    const scroll = vi.fn();
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = scroll;
+    window.history.replaceState(null, "", "#facts-streets");
+    try {
+      render(<FactsView />);
+      expect(scroll).toHaveBeenCalledTimes(1);
+      expect(scroll.mock.contexts[0]).toHaveProperty("id", "facts-streets");
+    } finally {
+      Element.prototype.scrollIntoView = original;
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  });
+
   it("links each section from the table of contents", () => {
     const { container } = render(<FactsView />);
     const toc = screen.getByRole("navigation", { name: "Facts sections" });
@@ -240,7 +290,8 @@ describe("FactsView with other data shapes", () => {
     expect(text("biggest-building")).not.toContain("its own unit label");
     expect(text("geographic-extremes")).not.toContain("has no civic number or street");
     expect(text("loneliest-building")).toContain("59 Aspen RD in Fort Liard, NT is 150.8 km");
-    expect(text("loneliest-building")).not.toContain("Third place");
+    expect(text("loneliest-building")).not.toContain("Red Lake");
+    expect(text("loneliest-building")).toContain("Fort Liard has 1 geocoded address out of 5 and Ivujivik has one address in the register.");
     expect(text("tiny-municipality-counts")).toContain("The small ones include First Nations reserves");
     expect(text("tiny-municipality-counts")).toContain("the median one has 11.5 addresses");
     expect(text("shared-names-across-provinces")).toContain("puts it in 5 provinces.");

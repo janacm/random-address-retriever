@@ -231,6 +231,20 @@ describe("App navigation", () => {
     expect(screen.getByText("No address yet")).toBeInTheDocument();
   });
 
+  it("opens on Facts for a #facts- deep link and drops the anchor on leaving", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/#facts-streets");
+    render(<App />);
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Facts from the National Address Register" })
+    ).toBeInTheDocument();
+    await user.click(
+      within(screen.getByRole("navigation", { name: "Primary" })).getByRole("button", { name: "Retriever" })
+    );
+    expect(screen.getByText("No address yet")).toBeInTheDocument();
+    expect(window.location.hash).toBe("");
+  });
+
   it("opens the Facts page from the nav, right after Retriever", async () => {
     const user = userEvent.setup();
     render(<App />);

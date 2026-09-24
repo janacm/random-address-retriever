@@ -7,10 +7,11 @@ import {
   Search,
   Shuffle,
 } from "lucide-react";
-import { FormEvent, lazy, Suspense, useMemo, useState } from "react";
+import { FormEvent, lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { usePostHog } from "@posthog/react";
 import { AddressApiError, fetchRandomAddress } from "./api";
 import { CityCombobox } from "./components/CityCombobox";
+import { LoadErrorBoundary } from "./components/LoadErrorBoundary";
 import type { View } from "./nav";
 import {
   AboutView,
@@ -87,7 +88,19 @@ function getErrorMessage(error: unknown) {
 
 export function App() {
   const posthog = usePostHog();
-  const [view, setView] = useState<View>("retriever");
+  // Views are React state, not routes. The Facts table of contents links to
+  // #facts-* anchors, so a reload or shared link with one of those opens Facts.
+  const [view, setView] = useState<View>(() =>
+    window.location.hash.startsWith("#facts-") ? "facts" : "retriever"
+  );
+
+  useEffect(() => {
+    // Drop a stale #facts-* anchor on leaving Facts, so a reload stays put.
+    if (view !== "facts" && window.location.hash.startsWith("#facts-")) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, [view]);
+
   const [city, setCity] = useState("Burlington");
   const [province, setProvince] = useState<ProvinceCode | "">("ON");
   const [verbose, setVerbose] = useState(false);
@@ -397,16 +410,18 @@ export function App() {
         ) : null}
 
         {view === "facts" ? (
-          <Suspense
-            fallback={
-              <section className="page" aria-label="Facts" aria-busy="true">
-                <p className="eyebrow">Facts</p>
-                <p>Loading facts…</p>
-              </section>
-            }
-          >
-            <FactsView />
-          </Suspense>
+          <LoadErrorBoundary what="facts">
+            <Suspense
+              fallback={
+                <section className="page" aria-label="Facts" aria-busy="true">
+                  <p className="eyebrow">Facts</p>
+                  <p>Loading facts…</p>
+                </section>
+              }
+            >
+              <FactsView />
+            </Suspense>
+          </LoadErrorBoundary>
         ) : null}
         {view === "api" ? <ApiAccessView /> : null}
         {view === "about" ? <AboutView /> : null}

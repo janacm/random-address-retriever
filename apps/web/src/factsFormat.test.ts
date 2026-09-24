@@ -78,11 +78,12 @@ describe("joinList", () => {
 describe("census subdivision types", () => {
   it("names known codes and falls back for unknown ones", () => {
     expect(csdTypeName("IRI")).toBe("Indian reserve");
-    expect(csdTypeName("FD")).toBeUndefined();
+    expect(csdTypeName("FD")).toBe("fire district");
+    expect(csdTypeName("XX")).toBeUndefined();
     expect(csdTypeLabel("RGM")).toBe("regional municipality (RGM)");
-    expect(csdTypeLabel("FD")).toBe("type FD");
-    expect(csdTypeWord("DM")).toBe("district municipality");
-    expect(csdTypeWord("RMU")).toBe("type RMU");
+    expect(csdTypeLabel("XX")).toBe("type XX");
+    expect(csdTypeWord("RMU")).toBe("resort municipality");
+    expect(csdTypeWord("XX")).toBe("type XX");
   });
 
   it("treats city and ville codes as cities", () => {

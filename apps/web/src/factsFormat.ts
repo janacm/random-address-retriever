@@ -89,6 +89,8 @@ const CSD_TYPES: Record<string, string> = {
   RDA: "regional district electoral area",
   LGD: "local government district",
   CC: "chartered community",
+  FD: "fire district",
+  RMU: "resort municipality",
   NH: "northern hamlet",
   RV: "resort village",
   SG: "self-government",
@@ -98,13 +100,13 @@ export function csdTypeName(code: string): string | undefined {
   return CSD_TYPES[code];
 }
 
-/** "district municipality (DM)", or "type FD" when the code is not listed. */
+/** "district municipality (DM)", or "type XX" when the code is not listed. */
 export function csdTypeLabel(code: string): string {
   const name = CSD_TYPES[code];
   return name ? `${name} (${code})` : `type ${code}`;
 }
 
-/** "district municipality", or "type FD" when the code is not listed. */
+/** "district municipality", or "type XX" when the code is not listed. */
 export function csdTypeWord(code: string): string {
   return CSD_TYPES[code] ?? `type ${code}`;
 }
