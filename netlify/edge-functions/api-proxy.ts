@@ -3,17 +3,16 @@ import type { Context } from "@netlify/edge-functions";
 /**
  * Server-side proxy for the Random Address API.
  *
- * The browser calls same-origin relative paths (`/api/*`, `/healthz`). This
- * Edge Function forwards them to the Cloudflare Tunnel hostname, injecting the
- * bearer token (and optional Cloudflare Access service-token headers) so the
- * secrets never reach the client and there is no CORS. Any auth headers sent by
- * the browser are ignored — a fresh header set is built here.
+ * The browser calls same-origin relative paths (`/api/*`). This Edge Function
+ * forwards them to the API, which runs as a Neon Function next to the
+ * database, and injects the bearer token so the secret never reaches the
+ * client and there is no CORS. Any auth headers sent by the browser are
+ * ignored: a fresh header set is built here.
  *
  * Configure on the Netlify site (runtime env vars):
- *   ADDRESS_API_URL          required, e.g. https://address-api.janac.me
- *   ADDRESS_API_TOKEN        required, matches the local API's token
- *   CF_ACCESS_CLIENT_ID      optional, only if Cloudflare Access is enabled
- *   CF_ACCESS_CLIENT_SECRET  optional, only if Cloudflare Access is enabled
+ *   ADDRESS_API_URL    required, the Function's invocation URL
+ *                      (`neon functions get addressapi`)
+ *   ADDRESS_API_TOKEN  required, matches ADDRESS_API_TOKEN on the Function
  */
 
 function jsonError(status: number, code: string, message: string): Response {
@@ -23,7 +22,7 @@ function jsonError(status: number, code: string, message: string): Response {
   });
 }
 
-export default async (request: Request, _context: Context): Promise<Response> => {
+export default async (request: Request, context: Context): Promise<Response> => {
   const apiUrl = Netlify.env.get("ADDRESS_API_URL");
   const apiToken = Netlify.env.get("ADDRESS_API_TOKEN");
 
@@ -38,18 +37,16 @@ export default async (request: Request, _context: Context): Promise<Response> =>
   // Preserve the incoming path and query; only swap the origin to the API host.
   const incoming = new URL(request.url);
   const upstream = new URL(apiUrl);
-  upstream.pathname = incoming.pathname; // /api/random-address, /healthz, ...
+  upstream.pathname = incoming.pathname; // /api/random-address, /api/healthz, ...
   upstream.search = incoming.search;
 
   const headers = new Headers();
   headers.set("authorization", `Bearer ${apiToken}`);
   headers.set("accept", "application/json");
-
-  const cfAccessId = Netlify.env.get("CF_ACCESS_CLIENT_ID");
-  const cfAccessSecret = Netlify.env.get("CF_ACCESS_CLIENT_SECRET");
-  if (cfAccessId && cfAccessSecret) {
-    headers.set("cf-access-client-id", cfAccessId);
-    headers.set("cf-access-client-secret", cfAccessSecret);
+  // The API rate-limits per first x-forwarded-for hop. Setting it here from
+  // Netlify's view of the client keeps browsers from choosing their own key.
+  if (context.ip) {
+    headers.set("x-forwarded-for", context.ip);
   }
 
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
@@ -66,6 +63,8 @@ export default async (request: Request, _context: Context): Promise<Response> =>
       method: request.method,
       headers,
       body: hasBody ? await request.text() : undefined,
+      // Never replay the bearer token to wherever a redirect points.
+      redirect: "manual",
     });
   } catch {
     return jsonError(502, "upstream_unreachable", "The address API is unavailable.");

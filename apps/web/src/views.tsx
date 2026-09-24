@@ -161,7 +161,10 @@ function HealthCard() {
       <dl className="healthList">
         <div>
           <dt>Endpoint</dt>
-          <dd>127.0.0.1:8787</dd>
+          {/* The browser always calls same-origin /api/healthz. The Vite dev
+              proxy sends it to the local API; in production Netlify's edge
+              proxy sends it to the Neon Function. */}
+          <dd>{import.meta.env.DEV ? "127.0.0.1:8787 (local API)" : "Neon Function, via Netlify"}</dd>
         </div>
         <div>
           <dt>Database</dt>
@@ -190,7 +193,7 @@ export function AboutView() {
         <p>
           Every result is a real Canadian address drawn at random from Statistics
           Canada&rsquo;s National Address Register (NAR) — 17,169,294 rows imported
-          into a local Postgres database. No address is invented; each one maps back
+          into a Postgres database. No address is invented; each one maps back
           to the source identifiers in the register.
         </p>
         <p className="disclaimerNote">
@@ -232,7 +235,11 @@ export function AboutView() {
           <div className="guideBody">
             <p className="eyebrow">Source</p>
             <h2>Statistics Canada NAR</h2>
-            <span>CSV import backed by local Postgres</span>
+            <span>
+              {import.meta.env.DEV
+                ? "CSV import in a local Postgres database"
+                : "CSV import hosted on Neon Postgres"}
+            </span>
           </div>
         </section>
 

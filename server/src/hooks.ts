@@ -32,8 +32,13 @@ interface Bucket {
 
 /**
  * Fixed-window per-client rate limiter. Keyed by the first `x-forwarded-for`
- * hop (the request arrives via Cloudflare Tunnel) and falling back to the
- * socket address. `now` is injectable so tests need not depend on the clock.
+ * hop, falling back to the socket address. In production the Netlify edge
+ * proxy sets that header to the visitor's IP on a header set it builds itself,
+ * so a browser cannot choose its own key. A caller that skips the proxy can
+ * spoof the header, but it has no bearer token, so the auth hook rejects it
+ * before any database work. Buckets are in memory, so each process (or Neon
+ * Function isolate) counts separately. `now` is injectable so tests need not
+ * depend on the clock.
  */
 export function makeRateLimitHook(
   options: { windowMs: number; max: number; now?: () => number },

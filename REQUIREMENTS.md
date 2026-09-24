@@ -40,7 +40,9 @@ row when verbose/source mode is enabled.
 16. Use parameterized SQL only.
 17. Provide a local browser frontend for city/province lookup.
 18. Keep the API in `server/` (TypeScript) and the web frontend in `apps/web`.
-19. Expose the MacBook-hosted backend through Cloudflare Tunnel rather than NAS hosting.
+19. Host the production backend on managed services (Neon Postgres plus a Neon
+    Function for the API), with no dependency on a local machine. This
+    replaced the MacBook-plus-Cloudflare-Tunnel setup on 2026-09-24.
 20. Keep the DS220j as backup/support storage only.
 
 ## Data Requirements
@@ -127,7 +129,7 @@ Local API:
 Frontend:
 
 - Vite dev server defaults to `http://127.0.0.1:5173`.
-- The web app proxies `/api` and `/healthz` to the local API in development.
+- The web app proxies `/api` to the local API in development.
 
 The local Postgres cluster lives on the external APFS SSD at:
 
@@ -156,12 +158,14 @@ The API is implemented in `server/` as a strongly-typed
 connection, unit/integration tests, and CI (see
 [server/README.md](server/README.md)). The web frontend in `apps/web` calls it.
 
-The Cloudflare/Netlify path must:
+The production path (see [docs/DEPLOY.md](docs/DEPLOY.md)) must:
 
-- Expose only the local API through Cloudflare Tunnel.
-- Protect the tunnel hostname with Cloudflare Access Service Auth.
-- Store Cloudflare Access service-token credentials only in Netlify server-side environment variables.
-- Call the tunnel hostname only from a Netlify/Next server route, not browser code.
+- Serve the API's health check at `/api/healthz` as well, because Neon
+  Functions answer an exact `/healthz` at the platform.
+- Refuse to start the Neon Function without an explicit `ADDRESS_API_TOKEN`.
+- Store the API token only in Netlify server-side environment variables and on
+  the Function deployment.
+- Call the Function only from the Netlify edge proxy, not browser code.
 
 ## Performance Requirements
 

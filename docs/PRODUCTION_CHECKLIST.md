@@ -1,5 +1,10 @@
 # Production Deployment Checklist
 
+> **Superseded 2026-09-24.** Production now runs on Netlify plus a Neon
+> Function and Neon Postgres, with no owned hardware in the path. See
+> [DEPLOY.md](DEPLOY.md). The checklist below describes the retired
+> tunnel setup.
+
 Reference checklist for serving the Random Address Retriever in production:
 a local Postgres + Fastify API on owned hardware, exposed through Cloudflare
 Tunnel, with the Vite frontend on Netlify.

@@ -1,11 +1,17 @@
 # Random Address API
 
 A small, strongly-typed HTTP API that returns a random Canadian address from
-the local NAR Postgres database. It is the only process that talks to Postgres;
-the web frontend in [`apps/web`](../apps/web) and the edge path (Cloudflare
-Tunnel, Cloudflare Access, the Netlify route) sit in front of it. See
-[docs/CLOUDFLARE_NETLIFY.md](../docs/CLOUDFLARE_NETLIFY.md) for the full edge
-architecture.
+the NAR Postgres database. It is the only process that talks to Postgres; the
+web frontend in [`apps/web`](../apps/web) and the Netlify edge proxy sit in
+front of it.
+
+It runs two ways from the same `buildApp()`:
+
+- locally, as a Node server (`src/index.ts`) against the local Postgres, and
+- in production, as the Neon Function `addressapi` (`src/function.ts`, declared
+  in the repo-root `neon.ts`) against the hosted sample on Neon.
+  `src/fetch-adapter.ts` turns the Fastify app into the `fetch(request)`
+  handler Neon calls. See [docs/DEPLOY.md](../docs/DEPLOY.md).
 
 ## Stack
 
@@ -26,8 +32,9 @@ All requests require the API token via `Authorization: Bearer <token>` or
 
 | Method & path | Description |
 |---|---|
-| `GET /healthz` | `{ data: { ok, database, durationMs } }`. |
+| `GET /healthz`, `GET /api/healthz` | `{ data: { ok, database, durationMs } }`. On a Neon Function the platform answers an exact `/healthz` itself with a plain-text `ok`, so use `/api/healthz` there. |
 | `GET /api/provinces` | `{ data: [{ code, name }, …] }`. |
+| `GET /api/cities?q=&province=&limit=` | City typeahead from the `nar_cities` view. |
 | `GET /api/random-address?city=&province=&verbose=` | Random address. `city` defaults to `Burlington`; `province` is an optional Canadian code; `verbose=true` nests `source: { locGuid, addrGuid }`. |
 
 ```bash
@@ -56,10 +63,11 @@ value is invalid.
 | `ADDRESS_API_CORS_ORIGIN` | `http://127.0.0.1:5173,http://localhost:5173` | Comma-separated allow-list (`*` allows all). |
 | `ADDRESS_API_RATE_LIMIT_WINDOW_MS` | `60000` | Fixed window per client. |
 | `ADDRESS_API_RATE_LIMIT_MAX` | `120` | Max requests per window. |
+| `DATABASE_URL` | — | Full connection string. When set, the `PG*` connection variables below are ignored. Neon injects it into the Function. |
 | `PGHOST` / `PGPORT` | `127.0.0.1` / `55432` | |
 | `PGDATABASE` | `random_address_retriever` | |
 | `PGUSER` / `PGPASSWORD` | current user / — | |
-| `PG_POOL_MAX` | `10` | Max pooled connections. |
+| `PG_POOL_MAX` | `10` (`5` on the Function) | Max pooled connections. |
 | `PG_STATEMENT_TIMEOUT_MS` | `30000` | `0` disables. |
 
 ## Develop
@@ -106,8 +114,10 @@ populate the visibility map.
 
 ## Security notes
 
-- Postgres and the API both bind to `127.0.0.1`; the API is reached only
-  through Cloudflare Tunnel + Access.
+- Locally, Postgres and the API both bind to `127.0.0.1`.
+- The Function's invocation URL is public, so the bearer token is the only
+  gate. `src/function.ts` forces production mode, so it never accepts the
+  `local-dev-token` default.
 - Token comparison is constant-time (`src/auth.ts`).
 - Queries are parameterized; province is matched exactly so the comparison
   stays index-friendly and injection-safe.

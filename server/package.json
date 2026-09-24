@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@fastify/type-provider-typebox": "^5",
+    "@neon/functions": "^0.11.0",
     "fastify": "^5.12.5",
     "pg": "^8"
   },

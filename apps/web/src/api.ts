@@ -29,7 +29,7 @@ export class AddressApiError extends Error {
   }
 }
 
-// Requests are same-origin and relative (`/api/*`, `/healthz`):
+// Requests are same-origin and relative (`/api/*`):
 // - Dev: the Vite dev server proxies them to the local API, which requires the
 //   bearer token (see apps/web/vite.config.ts).
 // - Prod: the Netlify Edge Function proxy injects the real token server-side,
@@ -93,7 +93,9 @@ export async function fetchCities(
 }
 
 export async function checkHealth() {
-  const response = await fetch("/healthz", {
+  // Not `/healthz`: in production the API runs as a Neon Function, and the
+  // platform answers that exact path itself with a plain-text "ok".
+  const response = await fetch("/api/healthz", {
     headers: authHeaders(),
   });
 

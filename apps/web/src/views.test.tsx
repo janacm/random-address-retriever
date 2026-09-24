@@ -45,6 +45,25 @@ describe("AboutView health check", () => {
     expect(screen.getByText("7 ms")).toBeInTheDocument();
   });
 
+  it("names the local API and local Postgres in development", () => {
+    render(<AboutView />);
+    expect(screen.getByText("127.0.0.1:8787 (local API)")).toBeInTheDocument();
+    expect(screen.getByText("CSV import in a local Postgres database")).toBeInTheDocument();
+  });
+
+  it("names the Neon Function and Neon Postgres in a production build", () => {
+    vi.stubEnv("DEV", false);
+    try {
+      render(<AboutView />);
+      expect(screen.getByText("Neon Function, via Netlify")).toBeInTheDocument();
+      expect(screen.getByText("CSV import hosted on Neon Postgres")).toBeInTheDocument();
+      expect(screen.queryByText(/127\.0\.0\.1/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/local Postgres/)).not.toBeInTheDocument();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it.each([
     [new Error("API unreachable"), "API unreachable"],
     ["nope", "Check failed."],

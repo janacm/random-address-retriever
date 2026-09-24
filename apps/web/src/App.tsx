@@ -203,7 +203,7 @@ export function App() {
               </button>
             ))}
           </nav>
-          <div className="topbarMeta" aria-label="Local database status">
+          <div className="topbarMeta" aria-label="Database status">
             <Database aria-hidden="true" size={18} />
             <span>17,169,294 rows</span>
           </div>
