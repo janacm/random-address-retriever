@@ -230,4 +230,42 @@ describe("App navigation", () => {
     await user.click(screen.getByRole("button", { name: "Random Address Retriever" }));
     expect(screen.getByText("No address yet")).toBeInTheDocument();
   });
+
+  it("opens on Facts for a #facts- deep link and drops the anchor on leaving", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/#facts-streets");
+    render(<App />);
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Facts from the National Address Register" })
+    ).toBeInTheDocument();
+    await user.click(
+      within(screen.getByRole("navigation", { name: "Primary" })).getByRole("button", { name: "Retriever" })
+    );
+    expect(screen.getByText("No address yet")).toBeInTheDocument();
+    expect(window.location.hash).toBe("");
+  });
+
+  it("opens the Fun Facts page from the nav, right after Retriever", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const nav = screen.getByRole("navigation", { name: "Primary" });
+    expect(within(nav).getAllByRole("button").map((b) => b.textContent)).toEqual([
+      "Retriever",
+      "Fun Facts",
+      "API access",
+      "About",
+    ]);
+
+    await user.click(within(nav).getByRole("button", { name: "Fun Facts" }));
+    // lazy-loaded, so the heading arrives after the Suspense fallback
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Facts from the National Address Register" })
+    ).toBeInTheDocument();
+    expect(within(nav).getByRole("button", { name: "Fun Facts" })).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByText("No address yet")).not.toBeInTheDocument();
+
+    await user.click(within(nav).getByRole("button", { name: "Retriever" }));
+    expect(screen.getByText("No address yet")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Facts from the National Address Register" })).toBeNull();
+  });
 });

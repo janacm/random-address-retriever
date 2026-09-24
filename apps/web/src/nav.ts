@@ -1,1 +1,1 @@
-export type View = "retriever" | "api" | "about" | "terms" | "privacy";
+export type View = "retriever" | "facts" | "api" | "about" | "terms" | "privacy";

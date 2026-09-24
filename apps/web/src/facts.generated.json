@@ -1,0 +1,2740 @@
+{
+  "dataset": {
+    "source": "Statistics Canada, National Address Register",
+    "release": "July 2025",
+    "addresses": 17169294,
+    "addressesWithMunicipality": 17153565,
+    "addressesWithoutMunicipality": 15729,
+    "municipalities": 4163,
+    "buildings": 11732972,
+    "geocodedBuildings": 10548967,
+    "generatedBy": "scripts/facts-build.sh"
+  },
+  "tinyMunicipalities": {
+    "municipalities": 4163,
+    "under25": 536,
+    "under10": 329,
+    "exactlyOne": 94,
+    "under25Reserves": 216,
+    "under25RuralMunicipalities": 119,
+    "under25RuralMunicipalitiesOutsideSk": 0,
+    "skRuralMunicipalities": {
+      "municipalities": 165,
+      "under25": 119,
+      "exactlyOne": 26,
+      "median": 11
+    },
+    "byNameAndProvince": {
+      "municipalities": 4096,
+      "under25": 534,
+      "under10": 328,
+      "exactlyOne": 93
+    },
+    "retrieverCityList": {
+      "entries": 4612,
+      "entriesWithoutMailProvince": 523,
+      "under25": 931,
+      "exactlyOne": 202
+    }
+  },
+  "smallestMunicipalities": {
+    "addressesEach": 1,
+    "count": 94,
+    "byType": [
+      {
+        "csdType": "IRI",
+        "municipalities": 39
+      },
+      {
+        "csdType": "RM",
+        "municipalities": 26
+      },
+      {
+        "csdType": "SNO",
+        "municipalities": 7
+      },
+      {
+        "csdType": "NO",
+        "municipalities": 4
+      },
+      {
+        "csdType": "T",
+        "municipalities": 4
+      },
+      {
+        "csdType": "SÉ",
+        "municipalities": 3
+      },
+      {
+        "csdType": "CC",
+        "municipalities": 1
+      },
+      {
+        "csdType": "HAM",
+        "municipalities": 1
+      },
+      {
+        "csdType": "LGD",
+        "municipalities": 1
+      },
+      {
+        "csdType": "NH",
+        "municipalities": 1
+      },
+      {
+        "csdType": "PE",
+        "municipalities": 1
+      },
+      {
+        "csdType": "RDA",
+        "municipalities": 1
+      },
+      {
+        "csdType": "RV",
+        "municipalities": 1
+      },
+      {
+        "csdType": "S-É",
+        "municipalities": 1
+      },
+      {
+        "csdType": "SG",
+        "municipalities": 1
+      },
+      {
+        "csdType": "TP",
+        "municipalities": 1
+      },
+      {
+        "csdType": "VN",
+        "municipalities": 1
+      }
+    ],
+    "byProvince": [
+      {
+        "province": "SK",
+        "municipalities": 31
+      },
+      {
+        "province": "BC",
+        "municipalities": 25
+      },
+      {
+        "province": "NL",
+        "municipalities": 11
+      },
+      {
+        "province": "MB",
+        "municipalities": 6
+      },
+      {
+        "province": "YT",
+        "municipalities": 5
+      },
+      {
+        "province": "AB",
+        "municipalities": 4
+      },
+      {
+        "province": "ON",
+        "municipalities": 4
+      },
+      {
+        "province": "QC",
+        "municipalities": 4
+      },
+      {
+        "province": "NS",
+        "municipalities": 2
+      },
+      {
+        "province": "NT",
+        "municipalities": 2
+      }
+    ],
+    "missingMailingParts": 12,
+    "municipalities": [
+      {
+        "csdCode": "4813829",
+        "name": "Alexander 134B",
+        "province": "AB",
+        "csdType": "IRI",
+        "address": "62061 33 HWY, FORT ASSINIBOINE AB T0G 1A0"
+      },
+      {
+        "csdCode": "4816822",
+        "name": "Gregoire Lake 176A",
+        "province": "AB",
+        "csdType": "IRI",
+        "address": "121 Lakeshore DR, FORT MCMURRAY 468 FIRST NATION AB T9H 0J3"
+      },
+      {
+        "csdCode": "4808813",
+        "name": "Montana 139",
+        "province": "AB",
+        "csdType": "IRI",
+        "address": "29 20 HWY, MASKWACIS AB T0C 1N0"
+      },
+      {
+        "csdCode": "4815802",
+        "name": "Stoney 142, 143, 144",
+        "province": "AB",
+        "csdType": "IRI",
+        "address": "252176 Range Road 62, CALGARY AB T3Z 3R2"
+      },
+      {
+        "csdCode": "5931813",
+        "name": "Bridge River 1",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "153 Gott PL, LILLOOET BC V0K 1V0"
+      },
+      {
+        "csdCode": "5909847",
+        "name": "Bucktum 4",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "Unit 1, 50350 Trans Canada HWY, BOSTON BAR BC V0K 1C0"
+      },
+      {
+        "csdCode": "5924817",
+        "name": "Cape Mudge 10",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "495 Cape Mudge RD, QUATHIASKI COVE BC V0P 1N0"
+      },
+      {
+        "csdCode": "5923804",
+        "name": "Clakamucus 2",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "98 Thornton RD, UCLUELET BC V0R 3A0"
+      },
+      {
+        "csdCode": "5915804",
+        "name": "Coquitlam 2",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "2650 Pitt River RD, PORT COQUITLAM BC V3C 0K8"
+      },
+      {
+        "csdCode": "5931817",
+        "name": "Fountain 3",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "19490C 99 HWY, LILLOOET BC V0K 1V0"
+      },
+      {
+        "csdCode": "5933813",
+        "name": "Halhalaeden",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "2307 6 Mile RD, LYTTON BC V0K 1Z0"
+      },
+      {
+        "csdCode": "5951830",
+        "name": "Jean Baptiste 28",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "7098 Babine Lake RD, SMITHERS BC V0J 2N7"
+      },
+      {
+        "csdCode": "5949020",
+        "name": "Kitimat-Stikine C (Part 2)",
+        "province": "BC",
+        "csdType": "RDA",
+        "address": "4935 Kitamaat Village RD, HAISLA BC V8C 9B2"
+      },
+      {
+        "csdCode": "5931802",
+        "name": "Kowtain 17",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "40657 Government RD"
+      },
+      {
+        "csdCode": "5951813",
+        "name": "Laketown 3",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "18888 Kenney Dam RD, VANDERHOOF BC V0J 3A1"
+      },
+      {
+        "csdCode": "5933842",
+        "name": "Lytton 9B",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "1780 Spencer RD N, LYTTON BC V0K 1Z0"
+      },
+      {
+        "csdCode": "5919814",
+        "name": "Malachan 11",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "Unit 3, 420 First ST, PORT ALBERNI BC V9Y 7M8"
+      },
+      {
+        "csdCode": "5915825",
+        "name": "Matsqui 4",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "128 272 ST, ALDERGROVE BC V4W 2M4"
+      },
+      {
+        "csdCode": "5933850",
+        "name": "Nickeyeah 25",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "342 Spencer RD S, LYTTON BC V0K 1Z0"
+      },
+      {
+        "csdCode": "5941839",
+        "name": "Redstone Flat 1",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "207 20 HWY, CHILANKO FORKS BC V0L 1H0"
+      },
+      {
+        "csdCode": "5941868",
+        "name": "Sandy Harry 4",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "2020 Sonny's Meadow RD, ALKALI LAKE BC V0L 1B0"
+      },
+      {
+        "csdCode": "5933868",
+        "name": "Spintlum Flat 3",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "3121 Splintlum RD, LYTTON BC V0K 1Z0"
+      },
+      {
+        "csdCode": "5933889",
+        "name": "Squaam 2",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "5554 Agate Bay RD, LOUIS CREEK BC V0E 2E0"
+      },
+      {
+        "csdCode": "5909882",
+        "name": "Squawkum Creek 3",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "12879 Moses DR, DEROCHE BC V0M 1G0"
+      },
+      {
+        "csdCode": "5951825",
+        "name": "Tatla West 11",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "54177 Colleymount RD, BURNS LAKE BC V0J 1E2"
+      },
+      {
+        "csdCode": "5923825",
+        "name": "Tin Wis 11",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "1119 Pacific Rim HWY, TOFINO BC V0R 2Z0"
+      },
+      {
+        "csdCode": "5941850",
+        "name": "Toosey 1",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "42 Tlescoxeten RD, RISKE CREEK BC V0L 1T0"
+      },
+      {
+        "csdCode": "5933876",
+        "name": "Upper Nepa 6",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "2549 Kirkland Ranch RD, ASHCROFT BC V0K 1A0"
+      },
+      {
+        "csdCode": "5915840",
+        "name": "Whonnock 1",
+        "province": "BC",
+        "csdType": "IRI",
+        "address": "27289 96 AVE, MAPLE RIDGE BC V2W 1M4"
+      },
+      {
+        "csdCode": "4619052",
+        "name": "Bloodvein 12",
+        "province": "MB",
+        "csdType": "IRI",
+        "address": "423 Bloodvein RD, BLOODVEIN MB R0C 0J0"
+      },
+      {
+        "csdCode": "4623065",
+        "name": "Brochet 197",
+        "province": "MB",
+        "csdType": "IRI",
+        "address": "2 Reindeer DR"
+      },
+      {
+        "csdCode": "4622064",
+        "name": "Ilford",
+        "province": "MB",
+        "csdType": "S-É",
+        "address": "100 First ST E, ILFORD MB R0B 0S0"
+      },
+      {
+        "csdCode": "4609030",
+        "name": "Long Plain",
+        "province": "MB",
+        "csdType": "IRI",
+        "address": "45122 60 RD N, EDWIN MB R0H 0G0"
+      },
+      {
+        "csdCode": "4622017",
+        "name": "Mystery Lake",
+        "province": "MB",
+        "csdType": "LGD",
+        "address": "220 Station RD, THOMPSON MB"
+      },
+      {
+        "csdCode": "4615071",
+        "name": "Rolling River 67",
+        "province": "MB",
+        "csdType": "IRI",
+        "address": "2 270 HWY, ERICKSON MB R0J 0P0"
+      },
+      {
+        "csdCode": "1002031",
+        "name": "Division No.  2, Subd. C",
+        "province": "NL",
+        "csdType": "SNO",
+        "address": "13 Main Shed RD, BOAT HARBOUR WEST NL A0E 1C0"
+      },
+      {
+        "csdCode": "1002006",
+        "name": "Division No.  2, Subd. F",
+        "province": "NL",
+        "csdType": "SNO",
+        "address": "15 Main St, LITTLE ST LAWRENCE NL A0E 2L0"
+      },
+      {
+        "csdCode": "1002016",
+        "name": "Division No.  2, Subd. H",
+        "province": "NL",
+        "csdType": "SNO",
+        "address": "4 Dirt Rd, GRAND BEACH NL A0E 1X0"
+      },
+      {
+        "csdCode": "1007051",
+        "name": "Division No.  7, Subd. B",
+        "province": "NL",
+        "csdType": "SNO",
+        "address": "1 Main RD, NL A0G 3X0"
+      },
+      {
+        "csdCode": "1007018",
+        "name": "Division No.  7, Subd. I",
+        "province": "NL",
+        "csdType": "SNO",
+        "address": "16 Spillars Cove Rd, LITTLE CATALINA NL A0C 1W0"
+      },
+      {
+        "csdCode": "1008067",
+        "name": "Division No.  8, Subd. O",
+        "province": "NL",
+        "csdType": "SNO",
+        "address": "2 Main ST, NL A0K 5G0"
+      },
+      {
+        "csdCode": "1010008",
+        "name": "Division No. 10, Subd. B",
+        "province": "NL",
+        "csdType": "SNO",
+        "address": "7 Ranger Valley DR, LODGE BAY NL A0K 1T0"
+      },
+      {
+        "csdCode": "1007025",
+        "name": "Keels",
+        "province": "NL",
+        "csdType": "T",
+        "address": "11 Church RD, KEELS NL A0C 1R0"
+      },
+      {
+        "csdCode": "1008064",
+        "name": "Little Bay Islands",
+        "province": "NL",
+        "csdType": "T",
+        "address": "14 Main ST, BIRCHY HEAD NL A0K 1K0"
+      },
+      {
+        "csdCode": "1010010",
+        "name": "St. Lewis",
+        "province": "NL",
+        "csdType": "T",
+        "address": "133 Main RD, ST LEWIS NL A0K 4W0"
+      },
+      {
+        "csdCode": "1010006",
+        "name": "West St. Modeste",
+        "province": "NL",
+        "csdType": "T",
+        "address": "6 McDonald DR, WEST ST MODESTE NL A0K 5S0"
+      },
+      {
+        "csdCode": "1205002",
+        "name": "Bear River (Part) 6",
+        "province": "NS",
+        "csdType": "IRI",
+        "address": "15 Pine Ridge RD, BEAR RIVER NS B0S 1B0"
+      },
+      {
+        "csdCode": "1205006",
+        "name": "Bear River 6B",
+        "province": "NS",
+        "csdType": "IRI",
+        "address": "5959 Clementsvale RD, LEQUILLE NS B0S 1A0"
+      },
+      {
+        "csdCode": "6104009",
+        "name": "Fort Liard",
+        "province": "NT",
+        "csdType": "HAM",
+        "address": "Unit LOT#59 WHITE WITH WHITE TRIM. 1 FLOOR. 2015- HOUSE #59, 59 Aspen RD, FORT LIARD NT X0G 0A0"
+      },
+      {
+        "csdCode": "6101010",
+        "name": "Tsiigehtchic",
+        "province": "NT",
+        "csdType": "CC",
+        "address": "Unit LOT#57, 34 Steppe Bison DR, TSIIGEHTCHIC NT X0E 0B0"
+      },
+      {
+        "csdCode": "3519076",
+        "name": "Chippewas of Georgina Island First Nation",
+        "province": "ON",
+        "csdType": "IRI",
+        "address": "350 Chief Joseph Snake RD, SUTTON WEST ON L0E 1R0"
+      },
+      {
+        "csdCode": "3556098",
+        "name": "Cochrane, Unorganized, South East Part",
+        "province": "ON",
+        "csdType": "NO",
+        "address": "6 Bourkes RD, RAMORE ON P0K 1R0"
+      },
+      {
+        "csdCode": "3551034",
+        "name": "Cockburn Island",
+        "province": "ON",
+        "csdType": "TP",
+        "address": "16 I ST N, ON P0P 1R0"
+      },
+      {
+        "csdCode": "3559053",
+        "name": "Saug-A-Gaw-Sing 1",
+        "province": "ON",
+        "csdType": "IRI",
+        "address": "701 Big Island Reserve RD, MORSON ON P0W 1J0"
+      },
+      {
+        "csdCode": "2499140",
+        "name": "Ivujivik",
+        "province": "QC",
+        "csdType": "VN",
+        "address": "460 Qitsualuk RD, IVUJIVIK QC J0M 1H0"
+      },
+      {
+        "csdCode": "2414902",
+        "name": "Picard",
+        "province": "QC",
+        "csdType": "NO",
+        "address": "15 du Havre-de-Parke CH"
+      },
+      {
+        "csdCode": "2421015",
+        "name": "Saint-Louis-de-Gonzague-du-Cap-Tourmente",
+        "province": "QC",
+        "csdType": "PE",
+        "address": "441 du Cap-Tourmente CH, ST-JOACHIM-DE-MONTMORENCY QC G0A 3X0"
+      },
+      {
+        "csdCode": "2421902",
+        "name": "Sault-au-Cochon",
+        "province": "QC",
+        "csdType": "NO",
+        "address": "4 De Ceinture Du Lac CH, SAINT-TITE-DES-CAPS QC G0A 4J0"
+      },
+      {
+        "csdCode": "4706042",
+        "name": "Abernethy No. 186",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "368 Katepwa DR, ABERNETHY SK S0A 0A0"
+      },
+      {
+        "csdCode": "4704038",
+        "name": "Arlington No. 79",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "101 Cypress ST, SHAUNAVON SK S0N 2M0"
+      },
+      {
+        "csdCode": "4714034",
+        "name": "Barrier Valley No. 397",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "402 Fourth ST, ARCHERWILL SK S0E 0B0"
+      },
+      {
+        "csdCode": "4710046",
+        "name": "Big Quill No. 308",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "307 6 HWY, WYNYARD SK S0A 4T0"
+      },
+      {
+        "csdCode": "4712042",
+        "name": "Biggar No. 347",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "10 Main ST, BIGGAR SK S0K 0M0"
+      },
+      {
+        "csdCode": "4702066",
+        "name": "Caledonia No. 99",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "29 First AVE W, PARRY SK S0H 3L0"
+      },
+      {
+        "csdCode": "4708065",
+        "name": "Chesterfield No. 261",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "50 1st AVE, EATONIA SK S0L 0Y0"
+      },
+      {
+        "csdCode": "4715061",
+        "name": "Duck Lake No. 463",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "8 Angus ST"
+      },
+      {
+        "csdCode": "4716060",
+        "name": "Echo Bay",
+        "province": "SK",
+        "csdType": "RV",
+        "address": "222 Shell Lake CRES, SHELL LAKE SK S0J 2G0"
+      },
+      {
+        "csdCode": "4701011",
+        "name": "Enniskillen No. 3",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "917 Tupper ST, OXBOW SK S0C 2B0"
+      },
+      {
+        "csdCode": "4707021",
+        "name": "Excelsior No. 166",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "108 Third ST W, MAIN CENTRE SK S0H 2V0"
+      },
+      {
+        "csdCode": "4713049",
+        "name": "Eye Hill No. 382",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "23 Leicester ST, EVESHAM SK S0L 1B0"
+      },
+      {
+        "csdCode": "4705051",
+        "name": "Fertile Belt No. 183",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "12 Main ST, BANGOR SK S0A 0E0"
+      },
+      {
+        "csdCode": "4709019",
+        "name": "Garry No. 245",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "1 Main ST"
+      },
+      {
+        "csdCode": "4713032",
+        "name": "Grandview No. 349",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "2021 Schuman ST, SK S0K 1Y0"
+      },
+      {
+        "csdCode": "4703068",
+        "name": "Gravelbourg No. 104",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "403 First AVE, GRAVELBOURG SK S0H 1X0"
+      },
+      {
+        "csdCode": "4712029",
+        "name": "Harris No. 316",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "200 Veterans RD, HARRIS SK S0L 1K0"
+      },
+      {
+        "csdCode": "4713046",
+        "name": "Heart's Hill No. 352",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "1 Main ST, CACTUS LAKE SK S0L 0J0"
+      },
+      {
+        "csdCode": "4715007",
+        "name": "Humboldt No. 370",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "5 Railway AVE, FULDA SK S0K 1T0"
+      },
+      {
+        "csdCode": "4713836",
+        "name": "Little Pine 116 (Part)",
+        "province": "SK",
+        "csdType": "IRI",
+        "address": "613 Little Pine RD, PAYNTON SK S0M 2J0"
+      },
+      {
+        "csdCode": "4717802",
+        "name": "Makaoo (Part) 120",
+        "province": "SK",
+        "csdType": "IRI",
+        "address": "3 17 HWY"
+      },
+      {
+        "csdCode": "4716038",
+        "name": "Meeting Lake No. 466",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "2 Main ST, MULLINGAR SK S0M 2A0"
+      },
+      {
+        "csdCode": "4718072",
+        "name": "Michel Village",
+        "province": "SK",
+        "csdType": "NH",
+        "address": "263 Janvier ST, DILLON SK S0M 0S0"
+      },
+      {
+        "csdCode": "4710024",
+        "name": "Mount Hope No. 279",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "205 Main ST, QUINTON SK S0A 3G0"
+      },
+      {
+        "csdCode": "4715099",
+        "name": "Paddockwood No. 520",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "67 55 HWY, WEIRDALE SK S0J 2Z0"
+      },
+      {
+        "csdCode": "4707011",
+        "name": "Shamrock No. 134",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "7 Railway AVE, SHAMROCK SK S0H 3W0"
+      },
+      {
+        "csdCode": "4714047",
+        "name": "Star City No. 428",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "Unit 715-MCDONALD EAST AVE, MELFORT SK S0E 1A0"
+      },
+      {
+        "csdCode": "4702014",
+        "name": "Surprise Valley No. 9",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "1 First ST, GLADMAR SK S0C 1A0"
+      },
+      {
+        "csdCode": "4712833",
+        "name": "Sweet Grass 113",
+        "province": "SK",
+        "csdType": "IRI",
+        "address": "135 Hayfield RD, GALLIVAN SK S0M 0X0"
+      },
+      {
+        "csdCode": "4707032",
+        "name": "Wheatlands No. 163",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "6 Brownlee ST, PARKBEG SK S0H 3K0"
+      },
+      {
+        "csdCode": "4713028",
+        "name": "Winslow No. 319",
+        "province": "SK",
+        "csdType": "RM",
+        "address": "28336 31 HWY, PLENTY SK S0L 2R0"
+      },
+      {
+        "csdCode": "6001042",
+        "name": "Beaver Creek",
+        "province": "YT",
+        "csdType": "SÉ",
+        "address": "9 Walt's WAY, BEAVER CREEK YT Y0B 1A0"
+      },
+      {
+        "csdCode": "6001039",
+        "name": "Burwash Landing",
+        "province": "YT",
+        "csdType": "SÉ",
+        "address": "19 Sedata ST, BURWASH LANDING YT Y0B 1V0"
+      },
+      {
+        "csdCode": "6001008",
+        "name": "Carcross 4",
+        "province": "YT",
+        "csdType": "SG",
+        "address": "7 Natasaheeni RD, CARCROSS YT Y0B 1B0"
+      },
+      {
+        "csdCode": "6001049",
+        "name": "Destruction Bay",
+        "province": "YT",
+        "csdType": "SÉ",
+        "address": "73 Shakwak ST, DESTRUCTION BAY YT Y0B 1H0"
+      },
+      {
+        "csdCode": "6001060",
+        "name": "Whitehorse, Unorganized",
+        "province": "YT",
+        "csdType": "NO",
+        "address": "115 Empress RD, WHITEHORSE YT"
+      }
+    ]
+  },
+  "littleBayIslands": {
+    "address": "14 Main ST, BIRCHY HEAD NL A0K 1K0",
+    "hasCoordinates": false,
+    "mailTown": "BIRCHY HEAD",
+    "postalCode": "A0K 1K0",
+    "otherMunicipalitiesOnPostalCode": [
+      {
+        "name": "Glenburnie-Birchy Head-Shoal Brook",
+        "addresses": 94
+      },
+      {
+        "name": "Woody Point, Bonne Bay",
+        "addresses": 1
+      }
+    ]
+  },
+  "meanMedian": {
+    "municipalities": 4163,
+    "addresses": 17153565,
+    "mean": 4120.5,
+    "median": 429,
+    "meanOverMedian": 9.6,
+    "belowMean": 3667,
+    "pctBelowMean": 88.1,
+    "largestOverMedian": 3069
+  },
+  "sizeBands": {
+    "municipalities": 4163,
+    "bands": [
+      {
+        "band": "exactly 1",
+        "municipalities": 94,
+        "pctMunicipalities": 2.3,
+        "addresses": 94,
+        "pctAddresses": 0
+      },
+      {
+        "band": "2-9",
+        "municipalities": 235,
+        "pctMunicipalities": 5.6,
+        "addresses": 1063,
+        "pctAddresses": 0.01
+      },
+      {
+        "band": "10-99",
+        "municipalities": 719,
+        "pctMunicipalities": 17.3,
+        "addresses": 32526,
+        "pctAddresses": 0.19
+      },
+      {
+        "band": "100-999",
+        "municipalities": 1742,
+        "pctMunicipalities": 41.8,
+        "addresses": 711435,
+        "pctAddresses": 4.15
+      },
+      {
+        "band": "1,000-9,999",
+        "municipalities": 1163,
+        "pctMunicipalities": 27.9,
+        "addresses": 3680091,
+        "pctAddresses": 21.45
+      },
+      {
+        "band": "10,000-99,999",
+        "municipalities": 186,
+        "pctMunicipalities": 4.5,
+        "addresses": 5330336,
+        "pctAddresses": 31.07
+      },
+      {
+        "band": "100,000-999,999",
+        "municipalities": 23,
+        "pctMunicipalities": 0.6,
+        "addresses": 6081237,
+        "pctAddresses": 35.45
+      },
+      {
+        "band": "1,000,000+",
+        "municipalities": 1,
+        "pctMunicipalities": 0,
+        "addresses": 1316783,
+        "pctAddresses": 7.68
+      }
+    ],
+    "atLeast100k": {
+      "municipalities": 24,
+      "addresses": 7398020,
+      "pctAddresses": 43.1
+    },
+    "atLeast1m": 1,
+    "percentiles": {
+      "p25": 98,
+      "p50": 429,
+      "p75": 1559
+    }
+  },
+  "halfOfAddresses": {
+    "municipalities": 4163,
+    "for50pct": 40,
+    "for75pct": 224,
+    "for90pct": 758,
+    "tippingMunicipality": {
+      "name": "Barrie",
+      "province": "ON",
+      "addresses": 61614,
+      "cumulativePct": 50.18
+    },
+    "bottomHalf": {
+      "municipalities": 2081,
+      "addresses": 278911,
+      "pct": 1.63,
+      "largestIncluded": 428,
+      "smallestExcluded": 429
+    },
+    "smallestLargerThanBottomHalf": {
+      "name": "Québec",
+      "province": "QC",
+      "addresses": 307548,
+      "rank": 8
+    }
+  },
+  "topMunicipalities": {
+    "totalAddresses": 17169294,
+    "top": [
+      {
+        "rank": 1,
+        "csdCode": "3520005",
+        "name": "Toronto",
+        "province": "ON",
+        "csdType": "C",
+        "addresses": 1316783,
+        "buildings": 488384,
+        "pctOfCanada": 7.67,
+        "cumulativePct": 7.67
+      },
+      {
+        "rank": 2,
+        "csdCode": "2466023",
+        "name": "Montréal",
+        "province": "QC",
+        "csdType": "V",
+        "addresses": 950209,
+        "buildings": 521734,
+        "pctOfCanada": 5.53,
+        "cumulativePct": 13.2
+      },
+      {
+        "rank": 3,
+        "csdCode": "4806016",
+        "name": "Calgary",
+        "province": "AB",
+        "csdType": "CY",
+        "addresses": 572879,
+        "buildings": 391096,
+        "pctOfCanada": 3.34,
+        "cumulativePct": 16.54
+      },
+      {
+        "rank": 4,
+        "csdCode": "4811061",
+        "name": "Edmonton",
+        "province": "AB",
+        "csdType": "CY",
+        "addresses": 467225,
+        "buildings": 291815,
+        "pctOfCanada": 2.72,
+        "cumulativePct": 19.26
+      },
+      {
+        "rank": 5,
+        "csdCode": "3506008",
+        "name": "Ottawa",
+        "province": "ON",
+        "csdType": "CV",
+        "addresses": 466475,
+        "buildings": 311446,
+        "pctOfCanada": 2.72,
+        "cumulativePct": 21.98
+      },
+      {
+        "rank": 6,
+        "csdCode": "5915022",
+        "name": "Vancouver",
+        "province": "BC",
+        "csdType": "CY",
+        "addresses": 354154,
+        "buildings": 126989,
+        "pctOfCanada": 2.06,
+        "cumulativePct": 24.04
+      },
+      {
+        "rank": 7,
+        "csdCode": "4611040",
+        "name": "Winnipeg",
+        "province": "MB",
+        "csdType": "CY",
+        "addresses": 354020,
+        "buildings": 215037,
+        "pctOfCanada": 2.06,
+        "cumulativePct": 26.1
+      },
+      {
+        "rank": 8,
+        "csdCode": "2423027",
+        "name": "Québec",
+        "province": "QC",
+        "csdType": "V",
+        "addresses": 307548,
+        "buildings": 174274,
+        "pctOfCanada": 1.79,
+        "cumulativePct": 27.89
+      },
+      {
+        "rank": 9,
+        "csdCode": "3521005",
+        "name": "Mississauga",
+        "province": "ON",
+        "csdType": "CY",
+        "addresses": 267359,
+        "buildings": 142009,
+        "pctOfCanada": 1.56,
+        "cumulativePct": 29.45
+      },
+      {
+        "rank": 10,
+        "csdCode": "3525005",
+        "name": "Hamilton",
+        "province": "ON",
+        "csdType": "C",
+        "addresses": 246681,
+        "buildings": 162891,
+        "pctOfCanada": 1.44,
+        "cumulativePct": 30.89
+      }
+    ],
+    "top5Addresses": 3773571,
+    "top5Pct": 21.98,
+    "top10Addresses": 5303333,
+    "top10Pct": 30.89,
+    "rank11": {
+      "name": "Halifax",
+      "province": "NS",
+      "csdType": "RGM",
+      "addresses": 226294
+    },
+    "tiesInTop11": 0
+  },
+  "biggestCity": {
+    "cityTypes": [
+      "C",
+      "CY",
+      "CV"
+    ],
+    "cityTypeMunicipalities": 165,
+    "villes": 234,
+    "largestCity": {
+      "name": "Toronto",
+      "province": "ON",
+      "csdType": "C",
+      "addresses": 1316783,
+      "rank": 1
+    },
+    "top10AllCityOrVille": true,
+    "largestNonCity": {
+      "name": "Halifax",
+      "province": "NS",
+      "csdType": "RGM",
+      "addresses": 226294,
+      "rank": 11
+    }
+  },
+  "mostBuildings": {
+    "top": [
+      {
+        "rank": 1,
+        "name": "Montréal",
+        "province": "QC",
+        "buildings": 521734,
+        "addresses": 950209,
+        "addressesPerBuilding": 1.82,
+        "addressRank": 2
+      },
+      {
+        "rank": 2,
+        "name": "Toronto",
+        "province": "ON",
+        "buildings": 488384,
+        "addresses": 1316783,
+        "addressesPerBuilding": 2.7,
+        "addressRank": 1
+      },
+      {
+        "rank": 3,
+        "name": "Calgary",
+        "province": "AB",
+        "buildings": 391096,
+        "addresses": 572879,
+        "addressesPerBuilding": 1.46,
+        "addressRank": 3
+      },
+      {
+        "rank": 4,
+        "name": "Ottawa",
+        "province": "ON",
+        "buildings": 311446,
+        "addresses": 466475,
+        "addressesPerBuilding": 1.5,
+        "addressRank": 5
+      },
+      {
+        "rank": 5,
+        "name": "Edmonton",
+        "province": "AB",
+        "buildings": 291815,
+        "addresses": 467225,
+        "addressesPerBuilding": 1.6,
+        "addressRank": 4
+      }
+    ],
+    "sixthBuildings": 215037
+  },
+  "torontoVsRegions": {
+    "municipality": {
+      "name": "Toronto",
+      "province": "ON",
+      "addresses": 1316783,
+      "buildings": 488384
+    },
+    "atlanticPlusTerritories": {
+      "addresses": 1269735,
+      "buildings": 1028788
+    },
+    "manitobaPlusSaskatchewan": {
+      "addresses": 998292,
+      "buildings": 708740
+    }
+  },
+  "nunavut": {
+    "addresses": 4239,
+    "municipalAddresses": 4239,
+    "communities": [
+      {
+        "name": "Iqaluit",
+        "addresses": 3021
+      },
+      {
+        "name": "Cambridge Bay",
+        "addresses": 418
+      },
+      {
+        "name": "Arviat",
+        "addresses": 396
+      },
+      {
+        "name": "Kugluktuk",
+        "addresses": 183
+      },
+      {
+        "name": "Baker Lake",
+        "addresses": 108
+      },
+      {
+        "name": "Rankin Inlet",
+        "addresses": 102
+      },
+      {
+        "name": "Gjoa Haven",
+        "addresses": 8
+      },
+      {
+        "name": "Arctic Bay",
+        "addresses": 3
+      }
+    ],
+    "municipalitiesBigger": 486,
+    "municipalitiesEqual": 0,
+    "nextLarger": {
+      "name": "La Sarre",
+      "province": "QC",
+      "csdType": "V",
+      "addresses": 4243
+    }
+  },
+  "biggestTown": {
+    "name": "Oakville",
+    "province": "ON",
+    "csdType": "T",
+    "addresses": 83687,
+    "rank": 27,
+    "sameCount": 0,
+    "cityTypeMunicipalities": 165,
+    "cityTypeSmaller": 146,
+    "cityOrVilleMunicipalities": 399,
+    "cityOrVilleSmaller": 374,
+    "nextTown": {
+      "name": "Whitby",
+      "province": "ON",
+      "addresses": 52183
+    }
+  },
+  "smallestCities": {
+    "cities": [
+      {
+        "name": "Greenwood",
+        "province": "BC",
+        "csdType": "CY",
+        "addresses": 451
+      },
+      {
+        "name": "Enderby",
+        "province": "BC",
+        "csdType": "CY",
+        "addresses": 1598
+      },
+      {
+        "name": "Rossland",
+        "province": "BC",
+        "csdType": "CY",
+        "addresses": 2009
+      }
+    ],
+    "villes": [
+      {
+        "name": "L'Île-Dorval",
+        "province": "QC",
+        "csdType": "V",
+        "addresses": 5
+      },
+      {
+        "name": "L'Île-Cadieux",
+        "province": "QC",
+        "csdType": "V",
+        "addresses": 70
+      },
+      {
+        "name": "Barkmere",
+        "province": "QC",
+        "csdType": "V",
+        "addresses": 118
+      }
+    ]
+  },
+  "provinceExtremes": [
+    {
+      "province": "NL",
+      "municipalities": 337,
+      "addresses": 214611,
+      "mean": 637,
+      "median": 119,
+      "biggest": [
+        {
+          "name": "St. John's",
+          "csdType": "CY",
+          "addresses": 57586,
+          "pctOfProvince": 26.8
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 11,
+      "smallest": null
+    },
+    {
+      "province": "PE",
+      "municipalities": 96,
+      "addresses": 86025,
+      "mean": 896,
+      "median": 294,
+      "biggest": [
+        {
+          "name": "Charlottetown",
+          "csdType": "CY",
+          "addresses": 21644,
+          "pctOfProvince": 25.2
+        }
+      ],
+      "smallestAddresses": 10,
+      "smallestTied": 1,
+      "smallest": [
+        {
+          "name": "Morell 2",
+          "csdType": "IRI"
+        }
+      ]
+    },
+    {
+      "province": "NS",
+      "municipalities": 93,
+      "addresses": 537164,
+      "mean": 5776,
+      "median": 2191,
+      "biggest": [
+        {
+          "name": "Halifax",
+          "csdType": "RGM",
+          "addresses": 226294,
+          "pctOfProvince": 42.1
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 2,
+      "smallest": [
+        {
+          "name": "Bear River (Part) 6",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Bear River 6B",
+          "csdType": "IRI"
+        }
+      ]
+    },
+    {
+      "province": "NB",
+      "municipalities": 107,
+      "addresses": 394888,
+      "mean": 3691,
+      "median": 2171,
+      "biggest": [
+        {
+          "name": "Moncton",
+          "csdType": "C",
+          "addresses": 41396,
+          "pctOfProvince": 10.5
+        }
+      ],
+      "smallestAddresses": 2,
+      "smallestTied": 1,
+      "smallest": [
+        {
+          "name": "Tabusintac 9",
+          "csdType": "IRI"
+        }
+      ]
+    },
+    {
+      "province": "QC",
+      "municipalities": 1185,
+      "addresses": 4427443,
+      "mean": 3736,
+      "median": 684,
+      "biggest": [
+        {
+          "name": "Montréal",
+          "csdType": "V",
+          "addresses": 950209,
+          "pctOfProvince": 21.5
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 4,
+      "smallest": [
+        {
+          "name": "Ivujivik",
+          "csdType": "VN"
+        },
+        {
+          "name": "Picard",
+          "csdType": "NO"
+        },
+        {
+          "name": "Saint-Louis-de-Gonzague-du-Cap-Tourmente",
+          "csdType": "PE"
+        },
+        {
+          "name": "Sault-au-Cochon",
+          "csdType": "NO"
+        }
+      ]
+    },
+    {
+      "province": "ON",
+      "municipalities": 525,
+      "addresses": 6240438,
+      "mean": 11887,
+      "median": 1772,
+      "biggest": [
+        {
+          "name": "Toronto",
+          "csdType": "C",
+          "addresses": 1316783,
+          "pctOfProvince": 21.1
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 4,
+      "smallest": [
+        {
+          "name": "Chippewas of Georgina Island First Nation",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Cochrane, Unorganized, South East Part",
+          "csdType": "NO"
+        },
+        {
+          "name": "Cockburn Island",
+          "csdType": "TP"
+        },
+        {
+          "name": "Saug-A-Gaw-Sing 1",
+          "csdType": "IRI"
+        }
+      ]
+    },
+    {
+      "province": "MB",
+      "municipalities": 197,
+      "addresses": 568765,
+      "mean": 2887,
+      "median": 491,
+      "biggest": [
+        {
+          "name": "Winnipeg",
+          "csdType": "CY",
+          "addresses": 354020,
+          "pctOfProvince": 62.2
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 6,
+      "smallest": [
+        {
+          "name": "Bloodvein 12",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Brochet 197",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Ilford",
+          "csdType": "S-É"
+        },
+        {
+          "name": "Long Plain",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Mystery Lake",
+          "csdType": "LGD"
+        },
+        {
+          "name": "Rolling River 67",
+          "csdType": "IRI"
+        }
+      ]
+    },
+    {
+      "province": "SK",
+      "municipalities": 654,
+      "addresses": 427676,
+      "mean": 654,
+      "median": 56,
+      "biggest": [
+        {
+          "name": "Saskatoon",
+          "csdType": "CY",
+          "addresses": 129127,
+          "pctOfProvince": 30.2
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 31,
+      "smallest": null
+    },
+    {
+      "province": "AB",
+      "municipalities": 350,
+      "addresses": 1860410,
+      "mean": 5315,
+      "median": 442,
+      "biggest": [
+        {
+          "name": "Calgary",
+          "csdType": "CY",
+          "addresses": 572879,
+          "pctOfProvince": 30.8
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 4,
+      "smallest": [
+        {
+          "name": "Alexander 134B",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Gregoire Lake 176A",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Montana 139",
+          "csdType": "IRI"
+        },
+        {
+          "name": "Stoney 142, 143, 144",
+          "csdType": "IRI"
+        }
+      ]
+    },
+    {
+      "province": "BC",
+      "municipalities": 576,
+      "addresses": 2361642,
+      "mean": 4100,
+      "median": 404.5,
+      "biggest": [
+        {
+          "name": "Vancouver",
+          "csdType": "CY",
+          "addresses": 354154,
+          "pctOfProvince": 15
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 25,
+      "smallest": null
+    },
+    {
+      "province": "YT",
+      "municipalities": 20,
+      "addresses": 18257,
+      "mean": 913,
+      "median": 214,
+      "biggest": [
+        {
+          "name": "Whitehorse",
+          "csdType": "CY",
+          "addresses": 13510,
+          "pctOfProvince": 74
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 5,
+      "smallest": [
+        {
+          "name": "Beaver Creek",
+          "csdType": "SÉ"
+        },
+        {
+          "name": "Burwash Landing",
+          "csdType": "SÉ"
+        },
+        {
+          "name": "Carcross 4",
+          "csdType": "SG"
+        },
+        {
+          "name": "Destruction Bay",
+          "csdType": "SÉ"
+        },
+        {
+          "name": "Whitehorse, Unorganized",
+          "csdType": "NO"
+        }
+      ]
+    },
+    {
+      "province": "NT",
+      "municipalities": 15,
+      "addresses": 12007,
+      "mean": 800,
+      "median": 66,
+      "biggest": [
+        {
+          "name": "Yellowknife",
+          "csdType": "CY",
+          "addresses": 8687,
+          "pctOfProvince": 72.3
+        }
+      ],
+      "smallestAddresses": 1,
+      "smallestTied": 2,
+      "smallest": [
+        {
+          "name": "Fort Liard",
+          "csdType": "HAM"
+        },
+        {
+          "name": "Tsiigehtchic",
+          "csdType": "CC"
+        }
+      ]
+    },
+    {
+      "province": "NU",
+      "municipalities": 8,
+      "addresses": 4239,
+      "mean": 530,
+      "median": 145.5,
+      "biggest": [
+        {
+          "name": "Iqaluit",
+          "csdType": "CY",
+          "addresses": 3021,
+          "pctOfProvince": 71.3
+        }
+      ],
+      "smallestAddresses": 3,
+      "smallestTied": 1,
+      "smallest": [
+        {
+          "name": "Arctic Bay",
+          "csdType": "HAM"
+        }
+      ]
+    }
+  ],
+  "sameNameSameProvince": {
+    "names": 67,
+    "sameType": 13,
+    "maxPerName": 2,
+    "byProvince": [
+      {
+        "province": "QC",
+        "names": 31
+      },
+      {
+        "province": "PE",
+        "names": 15
+      },
+      {
+        "province": "BC",
+        "names": 6
+      },
+      {
+        "province": "MB",
+        "names": 6
+      },
+      {
+        "province": "NS",
+        "names": 5
+      },
+      {
+        "province": "ON",
+        "names": 3
+      },
+      {
+        "province": "AB",
+        "names": 1
+      }
+    ],
+    "largest": [
+      {
+        "name": "Hamilton",
+        "province": "ON",
+        "municipalities": [
+          {
+            "csdType": "C",
+            "addresses": 246681
+          },
+          {
+            "csdType": "TP",
+            "addresses": 4700
+          }
+        ]
+      },
+      {
+        "name": "Langley",
+        "province": "BC",
+        "municipalities": [
+          {
+            "csdType": "DM",
+            "addresses": 55591
+          },
+          {
+            "csdType": "CY",
+            "addresses": 15247
+          }
+        ]
+      },
+      {
+        "name": "North Vancouver",
+        "province": "BC",
+        "municipalities": [
+          {
+            "csdType": "DM",
+            "addresses": 36592
+          },
+          {
+            "csdType": "CY",
+            "addresses": 30539
+          }
+        ]
+      }
+    ]
+  },
+  "sharedNames": {
+    "names": [
+      {
+        "name": "Victoria",
+        "provinces": 4,
+        "municipalities": 5,
+        "places": [
+          {
+            "province": "NL",
+            "csdType": "T",
+            "addresses": 470
+          },
+          {
+            "province": "PE",
+            "csdType": "RM",
+            "addresses": 106
+          },
+          {
+            "province": "PE",
+            "csdType": "FD",
+            "addresses": 63
+          },
+          {
+            "province": "MB",
+            "csdType": "RM",
+            "addresses": 353
+          },
+          {
+            "province": "BC",
+            "csdType": "CY",
+            "addresses": 58482
+          }
+        ]
+      },
+      {
+        "name": "Armstrong",
+        "provinces": 3,
+        "municipalities": 3,
+        "places": [
+          {
+            "province": "ON",
+            "csdType": "TP",
+            "addresses": 426
+          },
+          {
+            "province": "MB",
+            "csdType": "RM",
+            "addresses": 105
+          },
+          {
+            "province": "BC",
+            "csdType": "CY",
+            "addresses": 2516
+          }
+        ]
+      },
+      {
+        "name": "St. Mary's",
+        "provinces": 3,
+        "municipalities": 3,
+        "places": [
+          {
+            "province": "NL",
+            "csdType": "T",
+            "addresses": 71
+          },
+          {
+            "province": "NS",
+            "csdType": "MD",
+            "addresses": 1864
+          },
+          {
+            "province": "BC",
+            "csdType": "IRI",
+            "addresses": 10
+          }
+        ]
+      },
+      {
+        "name": "Stratford",
+        "provinces": 3,
+        "municipalities": 3,
+        "places": [
+          {
+            "province": "PE",
+            "csdType": "T",
+            "addresses": 5121
+          },
+          {
+            "province": "QC",
+            "csdType": "CT",
+            "addresses": 968
+          },
+          {
+            "province": "ON",
+            "csdType": "CY",
+            "addresses": 16550
+          }
+        ]
+      },
+      {
+        "name": "Woodstock",
+        "provinces": 3,
+        "municipalities": 3,
+        "places": [
+          {
+            "province": "NL",
+            "csdType": "T",
+            "addresses": 87
+          },
+          {
+            "province": "NB",
+            "csdType": "TV",
+            "addresses": 5858
+          },
+          {
+            "province": "ON",
+            "csdType": "CY",
+            "addresses": 21882
+          }
+        ]
+      }
+    ],
+    "spellingVariants": [
+      {
+        "spellings": [
+          "St. Mary's",
+          "St. Marys"
+        ],
+        "provinces": 4,
+        "municipalities": 4
+      }
+    ],
+    "burlington": [
+      {
+        "province": "ON",
+        "csdType": "CY",
+        "addresses": 79160
+      },
+      {
+        "province": "NL",
+        "csdType": "T",
+        "addresses": 101
+      }
+    ]
+  },
+  "nameLengths": {
+    "longest": [
+      {
+        "name": "Stanley Bridge, Hope River, Bayview, Cavendish and North Rustico",
+        "province": "PE",
+        "csdType": "RMU",
+        "length": 64,
+        "addresses": 487
+      }
+    ],
+    "shortest": [
+      {
+        "name": "Emo",
+        "province": "ON",
+        "csdType": "TP",
+        "length": 3,
+        "addresses": 463
+      },
+      {
+        "name": "Low",
+        "province": "QC",
+        "csdType": "CT",
+        "length": 3,
+        "addresses": 958
+      },
+      {
+        "name": "Oka",
+        "province": "QC",
+        "csdType": "MÉ",
+        "length": 3,
+        "addresses": 1820
+      },
+      {
+        "name": "Tay",
+        "province": "ON",
+        "csdType": "TP",
+        "length": 3,
+        "addresses": 5687
+      }
+    ],
+    "longestStreet": [
+      {
+        "street": "des Religieuses Hospitalières de Saint-Joseph PROM",
+        "length": 45,
+        "municipality": "Campbellton",
+        "province": "NB",
+        "addresses": 1,
+        "example": "26 des Religieuses Hospitalières de Saint-Joseph PROM, CAMPBELLTON NB E3N 1S8"
+      }
+    ]
+  },
+  "quebecSaints": {
+    "quebecMunicipalities": 1185,
+    "saint": 376,
+    "sainte": 108,
+    "pct": 40.8,
+    "exclamationMunicipalities": [
+      {
+        "name": "Saint-Louis-du-Ha! Ha!",
+        "province": "QC",
+        "addresses": 665
+      }
+    ],
+    "exclamationStreets": [
+      {
+        "street": "du Lac-Ha! Ha! CH",
+        "municipality": "Ferland-et-Boilleau",
+        "province": "QC",
+        "addresses": 3
+      }
+    ]
+  },
+  "mainStreet": {
+    "byAddresses": [
+      {
+        "name": "Main",
+        "addresses": 81202,
+        "buildings": 51843,
+        "municipalities": 985,
+        "provinces": 11
+      },
+      {
+        "name": "Principale",
+        "addresses": 63742,
+        "buildings": 53032,
+        "municipalities": 485,
+        "provinces": 4
+      },
+      {
+        "name": "King",
+        "addresses": 51102,
+        "buildings": 20174,
+        "municipalities": 399,
+        "provinces": 12
+      },
+      {
+        "name": "Victoria",
+        "addresses": 39850,
+        "buildings": 23315,
+        "municipalities": 390,
+        "provinces": 11
+      },
+      {
+        "name": "Queen",
+        "addresses": 35823,
+        "buildings": 17115,
+        "municipalities": 314,
+        "provinces": 11
+      }
+    ],
+    "byMunicipalities": [
+      {
+        "name": "Main",
+        "municipalities": 985
+      },
+      {
+        "name": "Maple",
+        "municipalities": 546
+      },
+      {
+        "name": "Railway",
+        "municipalities": 534
+      },
+      {
+        "name": "Park",
+        "municipalities": 533
+      },
+      {
+        "name": "Principale",
+        "municipalities": 485
+      },
+      {
+        "name": "Church",
+        "municipalities": 467
+      }
+    ],
+    "fullNameByMunicipalities": [
+      {
+        "name": "Main",
+        "type": "ST",
+        "municipalities": 863,
+        "provinces": 11,
+        "addresses": 73710
+      },
+      {
+        "name": "Principale",
+        "type": "RUE",
+        "municipalities": 445,
+        "provinces": 2,
+        "addresses": 57638
+      },
+      {
+        "name": "Railway",
+        "type": "AVE",
+        "municipalities": 431,
+        "provinces": 6,
+        "addresses": 6168
+      },
+      {
+        "name": "King",
+        "type": "ST",
+        "municipalities": 309,
+        "provinces": 11,
+        "addresses": 44908
+      },
+      {
+        "name": "Queen",
+        "type": "ST",
+        "municipalities": 294,
+        "provinces": 11,
+        "addresses": 33844
+      }
+    ],
+    "provincesWithout": [
+      "NT",
+      "NU"
+    ]
+  },
+  "principale": {
+    "byBuildings": [
+      {
+        "name": "Principale",
+        "buildings": 53032,
+        "addresses": 63742,
+        "addressesPerBuilding": 1.2
+      },
+      {
+        "name": "Main",
+        "buildings": 51843,
+        "addresses": 81202,
+        "addressesPerBuilding": 1.57
+      },
+      {
+        "name": "Victoria",
+        "buildings": 23315,
+        "addresses": 39850,
+        "addressesPerBuilding": 1.71
+      }
+    ],
+    "buildingsByProvince": [
+      {
+        "province": "QC",
+        "buildings": 48865
+      },
+      {
+        "province": "NB",
+        "buildings": 3382
+      },
+      {
+        "province": "ON",
+        "buildings": 697
+      },
+      {
+        "province": "MB",
+        "buildings": 88
+      }
+    ],
+    "fullNames": [
+      {
+        "name": "Principale",
+        "type": "RUE",
+        "buildings": 47996,
+        "addresses": 57809
+      },
+      {
+        "name": "Main",
+        "type": "ST",
+        "buildings": 46093,
+        "addresses": 74117
+      }
+    ]
+  },
+  "busiestStreets": {
+    "streets": 420294,
+    "byAddresses": [
+      {
+        "street": "Yonge ST",
+        "municipality": "Toronto",
+        "province": "ON",
+        "addresses": 18597,
+        "buildings": 1311
+      },
+      {
+        "street": "Bathurst ST",
+        "municipality": "Toronto",
+        "province": "ON",
+        "addresses": 13238,
+        "buildings": 1139
+      },
+      {
+        "street": "Lake Shore BLVD W",
+        "municipality": "Toronto",
+        "province": "ON",
+        "addresses": 10829,
+        "buildings": 727
+      }
+    ],
+    "fourthAddresses": 9632,
+    "byBuildings": [
+      {
+        "street": "Saint-Denis RUE",
+        "municipality": "Montréal",
+        "province": "QC",
+        "addresses": 6521,
+        "buildings": 4006
+      },
+      {
+        "street": "Saint-Hubert RUE",
+        "municipality": "Montréal",
+        "province": "QC",
+        "addresses": 5165,
+        "buildings": 3100
+      },
+      {
+        "street": "de Lorimier AV",
+        "municipality": "Montréal",
+        "province": "QC",
+        "addresses": 3898,
+        "buildings": 3020
+      }
+    ],
+    "fourthBuildings": 2911
+  },
+  "repeatedAddresses": {
+    "top": [
+      {
+        "address": "201 Main ST",
+        "municipalities": 117
+      },
+      {
+        "address": "210 Main ST",
+        "municipalities": 111
+      },
+      {
+        "address": "101 Main ST",
+        "municipalities": 109
+      },
+      {
+        "address": "10 Main ST",
+        "municipalities": 103
+      },
+      {
+        "address": "15 Main ST",
+        "municipalities": 103
+      }
+    ],
+    "ignoringDirection": [
+      {
+        "address": "15 Main ST",
+        "municipalities": 139
+      }
+    ]
+  },
+  "funStreets": [
+    {
+      "name": "Memory",
+      "street": "Memory LANE",
+      "municipalities": 47,
+      "addresses": 423,
+      "addressesInclNoMunicipality": 423,
+      "nameMunicipalitiesAnyType": 50,
+      "where": null
+    },
+    {
+      "name": "Easy",
+      "street": "Easy ST",
+      "municipalities": 22,
+      "addresses": 315,
+      "addressesInclNoMunicipality": 318,
+      "nameMunicipalitiesAnyType": 24,
+      "where": null
+    },
+    {
+      "name": "Sesame",
+      "street": "Sesame ST",
+      "municipalities": 17,
+      "addresses": 278,
+      "addressesInclNoMunicipality": 278,
+      "nameMunicipalitiesAnyType": 19,
+      "where": null
+    },
+    {
+      "name": "Sasquatch",
+      "street": "Sasquatch TRAIL",
+      "municipalities": 1,
+      "addresses": 56,
+      "addressesInclNoMunicipality": 56,
+      "nameMunicipalitiesAnyType": 2,
+      "where": [
+        {
+          "municipality": "Okanagan-Similkameen A",
+          "province": "BC"
+        }
+      ]
+    },
+    {
+      "name": "No Name",
+      "street": "No Name RD",
+      "municipalities": 1,
+      "addresses": 28,
+      "addressesInclNoMunicipality": 28,
+      "nameMunicipalitiesAnyType": 1,
+      "where": [
+        {
+          "municipality": "Squamish",
+          "province": "BC"
+        }
+      ]
+    },
+    {
+      "name": "Hockey",
+      "street": "Hockey ST",
+      "municipalities": 1,
+      "addresses": 10,
+      "addressesInclNoMunicipality": 10,
+      "nameMunicipalitiesAnyType": 1,
+      "where": [
+        {
+          "municipality": "Saint John",
+          "province": "NB"
+        }
+      ]
+    },
+    {
+      "name": "Dead End",
+      "street": "Dead End RD",
+      "municipalities": 1,
+      "addresses": 6,
+      "addressesInclNoMunicipality": 6,
+      "nameMunicipalitiesAnyType": 2,
+      "where": [
+        {
+          "municipality": "Algoma, Unorganized, North Part",
+          "province": "ON"
+        }
+      ]
+    },
+    {
+      "name": "Wayne Gretzky",
+      "street": "Wayne Gretzky PKY",
+      "municipalities": 1,
+      "addresses": 3,
+      "addressesInclNoMunicipality": 3,
+      "nameMunicipalitiesAnyType": 1,
+      "where": [
+        {
+          "municipality": "Brantford",
+          "province": "ON"
+        }
+      ]
+    }
+  ],
+  "islands": {
+    "total": 1960,
+    "island": 1845,
+    "ile": 115,
+    "ileQuebec": 115,
+    "islandOntario": 1669,
+    "topMunicipalities": [
+      {
+        "municipality": "The Archipelago",
+        "province": "ON",
+        "addresses": 513
+      },
+      {
+        "municipality": "Bracebridge",
+        "province": "ON",
+        "addresses": 335
+      },
+      {
+        "municipality": "Carling",
+        "province": "ON",
+        "addresses": 196
+      }
+    ],
+    "ileTopMunicipalities": [
+      {
+        "municipality": "Mont-Laurier",
+        "province": "QC",
+        "addresses": 36
+      },
+      {
+        "municipality": "La Conception",
+        "province": "QC",
+        "addresses": 35
+      },
+      {
+        "municipality": "Shawinigan",
+        "province": "QC",
+        "addresses": 23
+      }
+    ],
+    "example": "9 A11 ISLAND"
+  },
+  "directions": {
+    "none": 14564687,
+    "nonePct": 84.83,
+    "top": {
+      "dir": "NW",
+      "addresses": 583600,
+      "pct": 3.4
+    },
+    "next": [
+      {
+        "dir": "E",
+        "addresses": 515128
+      },
+      {
+        "dir": "W",
+        "addresses": 409750
+      }
+    ],
+    "topByMunicipality": [
+      {
+        "municipality": "Edmonton",
+        "province": "AB",
+        "addresses": 411854,
+        "pctOfDirection": 70.6
+      },
+      {
+        "municipality": "Calgary",
+        "province": "AB",
+        "addresses": 150591,
+        "pctOfDirection": 25.8
+      }
+    ],
+    "withoutMunicipality": 113
+  },
+  "commonCivic": {
+    "top": [
+      {
+        "civic": "10",
+        "addresses": 108268,
+        "rank": 1
+      },
+      {
+        "civic": "15",
+        "addresses": 100300,
+        "rank": 2
+      },
+      {
+        "civic": "20",
+        "addresses": 94237,
+        "rank": 3
+      },
+      {
+        "civic": "11",
+        "addresses": 86547,
+        "rank": 4
+      },
+      {
+        "civic": "5",
+        "addresses": 84694,
+        "rank": 5
+      },
+      {
+        "civic": "8",
+        "addresses": 81949,
+        "rank": 6
+      },
+      {
+        "civic": "25",
+        "addresses": 81755,
+        "rank": 7
+      },
+      {
+        "civic": "7",
+        "addresses": 81163,
+        "rank": 8
+      },
+      {
+        "civic": "30",
+        "addresses": 79759,
+        "rank": 9
+      },
+      {
+        "civic": "1",
+        "addresses": 78910,
+        "rank": 10
+      }
+    ],
+    "one": {
+      "addresses": 78910,
+      "rank": 10
+    }
+  },
+  "highestCivic": {
+    "civic": 999958,
+    "street": "11 HWY",
+    "address": "999958 11 HWY, THORNLOE ON P0J 1S0",
+    "municipality": "Harley",
+    "province": "ON",
+    "tiedAtMax": 1,
+    "sameStreetInMunicipality": {
+      "addresses": 43,
+      "min": 999008,
+      "max": 999958
+    },
+    "sixDigit": 73956,
+    "sevenPlusDigit": 0
+  },
+  "civicSuffixes": {
+    "withSuffix": 203773,
+    "kinds": 29,
+    "letterKinds": 26,
+    "fractionKinds": 3,
+    "mostCommon": {
+      "suffix": "A",
+      "addresses": 117333
+    },
+    "a": 117333,
+    "half": 7376,
+    "quarter": 43,
+    "threeQuarters": 17,
+    "threeQuartersTopMunicipality": {
+      "municipality": "Québec",
+      "province": "QC",
+      "addresses": 11
+    },
+    "civicZero": 17
+  },
+  "biggestBuildings": {
+    "top": [
+      {
+        "rank": 1,
+        "addresses": 1012,
+        "address": "251 Jarvis ST",
+        "municipality": "Toronto",
+        "province": "ON",
+        "postalCodes": [
+          "M5B 0C3"
+        ],
+        "distinctUnitLabels": 1012,
+        "residential": 1005,
+        "partialResidential": 7
+      },
+      {
+        "rank": 2,
+        "addresses": 828,
+        "address": "7095 Gouin BOUL E",
+        "municipality": "Montréal",
+        "province": "QC",
+        "postalCodes": [
+          "H1E 6N1"
+        ],
+        "distinctUnitLabels": 828,
+        "residential": 816,
+        "partialResidential": 12
+      },
+      {
+        "rank": 3,
+        "addresses": 827,
+        "address": "386 Yonge ST",
+        "municipality": "Toronto",
+        "province": "ON",
+        "postalCodes": [
+          "M5B 0A5"
+        ],
+        "distinctUnitLabels": 827,
+        "residential": 510,
+        "partialResidential": 317
+      },
+      {
+        "rank": 4,
+        "addresses": 798,
+        "address": "70 Temperance ST",
+        "municipality": "Toronto",
+        "province": "ON",
+        "postalCodes": [
+          "M5H 0B1"
+        ],
+        "distinctUnitLabels": 798,
+        "residential": 550,
+        "partialResidential": 248
+      },
+      {
+        "rank": 5,
+        "addresses": 793,
+        "address": "44 Charles ST W",
+        "municipality": "Toronto",
+        "province": "ON",
+        "postalCodes": [
+          "M4Y 1R7",
+          "M4Y 1R8"
+        ],
+        "distinctUnitLabels": 793,
+        "residential": 596,
+        "partialResidential": 197
+      }
+    ],
+    "sixthAddresses": 789,
+    "buildings": 11732972,
+    "singleAddressBuildings": 11080798,
+    "pctSingleAddress": 94.44,
+    "addressesPerBuilding": 1.46
+  },
+  "basements": {
+    "exactBsmt": 137426,
+    "bsmtRank": 4,
+    "topLabels": [
+      {
+        "label": "1",
+        "addresses": 232900
+      },
+      {
+        "label": "2",
+        "addresses": 222734
+      },
+      {
+        "label": "3",
+        "addresses": 163398
+      },
+      {
+        "label": "BSMT",
+        "addresses": 137426
+      },
+      {
+        "label": "4",
+        "addresses": 127511
+      }
+    ],
+    "anyBasementLabel": 143442,
+    "topMunicipalities": [
+      {
+        "municipality": "Surrey",
+        "province": "BC",
+        "basement": 19073,
+        "addresses": 205345,
+        "pct": 9.29
+      },
+      {
+        "municipality": "Vancouver",
+        "province": "BC",
+        "basement": 18835,
+        "addresses": 354154,
+        "pct": 5.32
+      },
+      {
+        "municipality": "Toronto",
+        "province": "ON",
+        "basement": 17967,
+        "addresses": 1316783,
+        "pct": 1.36
+      }
+    ]
+  },
+  "houseDescriptions": {
+    "longest": [
+      {
+        "label": "LOT#408 GREEN WITH WHITE TRIM. 2 FLOORS. 3 WINDOWS. 2 WINDOWS, DOORS, SHED ON LEFT & RIGHT",
+        "length": 90,
+        "address": "408 Smith RD",
+        "municipality": "Aklavik",
+        "province": "NT"
+      }
+    ],
+    "descriptiveByProvince": [
+      {
+        "province": "NT",
+        "labels": 198
+      },
+      {
+        "province": "YT",
+        "labels": 3
+      }
+    ]
+  },
+  "extremes": {
+    "geocodedAddresses": 15848095,
+    "points": [
+      {
+        "direction": "north",
+        "lat": 73.035343,
+        "lon": -85.158072,
+        "addressesAtPoint": 1,
+        "address": null,
+        "municipality": "Arctic Bay",
+        "province": "NU",
+        "postalCode": "X0A 0A0"
+      },
+      {
+        "direction": "south",
+        "lat": 41.764275,
+        "lon": -82.68881,
+        "addressesAtPoint": 1,
+        "address": "Unit 4B, 1081 West Shore RD",
+        "municipality": "Pelee",
+        "province": "ON",
+        "postalCode": "N0R 1M0"
+      },
+      {
+        "direction": "east",
+        "lat": 47.523351,
+        "lon": -52.653144,
+        "addressesAtPoint": 1,
+        "address": "1510 Blackhead RD",
+        "municipality": "St. John's",
+        "province": "NL",
+        "postalCode": "A1C 5H2"
+      },
+      {
+        "direction": "west",
+        "lat": 64.055549,
+        "lon": -139.440751,
+        "addressesAtPoint": 1,
+        "address": "Unit LOT 1 BLOCK 14 GOVERNMENT RESERVE ADDITION DAWSON, 301 Dugas ST",
+        "municipality": "Dawson",
+        "province": "YT",
+        "postalCode": "Y0B 0A3"
+      }
+    ],
+    "northWithStreet": {
+      "lat": 69.454159,
+      "lon": -133.036089,
+      "address": "Unit LOT#9 BLOCK#1, 112 Anguilaluk CRES",
+      "municipality": "Tuktoyaktuk",
+      "province": "NT"
+    },
+    "northMunicipality": {
+      "name": "Arctic Bay",
+      "addresses": 3,
+      "withCivicNumber": 0,
+      "withStreet": 0
+    },
+    "northernmostInQuebec": {
+      "municipality": "Ivujivik",
+      "lat": 62.415021
+    }
+  },
+  "latitude": {
+    "geocodedAddresses": 15848095,
+    "southOf49": 11139998,
+    "pctSouthOf49": 70.29,
+    "northOf60": 34035,
+    "pctNorthOf60": 0.215,
+    "medianLat": 45.6321
+  },
+  "loneliest": {
+    "geocodedBuildings": 10548967,
+    "candidates": 24,
+    "unresolvedCandidates": 0,
+    "widestCellKm": 99.9,
+    "top": [
+      {
+        "rank": 1,
+        "km": 150.8,
+        "address": "59 Aspen RD",
+        "municipality": "Fort Liard",
+        "province": "NT",
+        "municipalityAddresses": 1,
+        "municipalityGeocoded": 1,
+        "nearest": {
+          "address": "3357 McConachie Creek RD",
+          "municipality": "Northern Rockies",
+          "province": "BC"
+        }
+      },
+      {
+        "rank": 2,
+        "km": 119.5,
+        "address": "460 Qitsualuk RD",
+        "municipality": "Ivujivik",
+        "province": "QC",
+        "municipalityAddresses": 1,
+        "municipalityGeocoded": 1,
+        "nearest": {
+          "address": "228 Kuugulummiut ST",
+          "municipality": "Salluit",
+          "province": "QC"
+        }
+      },
+      {
+        "rank": 3,
+        "km": 118.6,
+        "address": "34 Gold Eagle AVE",
+        "municipality": "Red Lake",
+        "province": "ON",
+        "municipalityAddresses": 1779,
+        "municipalityGeocoded": 1,
+        "nearest": {
+          "address": "46 Indian Lake Camp RD",
+          "municipality": "Kenora, Unorganized",
+          "province": "ON"
+        }
+      }
+    ]
+  },
+  "singleAddressFsas": {
+    "fsas": 1671,
+    "withTwoAddresses": 2,
+    "list": [
+      {
+        "fsa": "H5B",
+        "address": "1255 Jeanne-Mance RUE, MONTRÉAL QC H5B 1E5",
+        "municipality": "Montréal",
+        "province": "QC",
+        "buUse": "3"
+      },
+      {
+        "fsa": "L5P",
+        "address": "2710 Britannia RD E, MISSISSAUGA ON L5P 1A2",
+        "municipality": "Mississauga",
+        "province": "ON",
+        "buUse": "3"
+      },
+      {
+        "fsa": "M5L",
+        "address": "Unit 1, 1153 Roberts Bay RD, TORONTO ON M5L 1G2",
+        "municipality": "Muskoka Lakes",
+        "province": "ON",
+        "buUse": "1"
+      },
+      {
+        "fsa": "X0G",
+        "address": "Unit LOT#59 WHITE WITH WHITE TRIM. 1 FLOOR. 2015- HOUSE #59, 59 Aspen RD, FORT LIARD NT X0G 0A0",
+        "municipality": "Fort Liard",
+        "province": "NT",
+        "buUse": "1"
+      },
+      {
+        "fsa": "Y0C",
+        "address": "Unit LOT 1112-1 QUAD 105 A/2, 210 Robert Campbell HWY, WATSON LAKE YT Y0C 1C0",
+        "municipality": "Watson Lake",
+        "province": "YT",
+        "buUse": "3"
+      }
+    ]
+  }
+}

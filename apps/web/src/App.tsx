@@ -7,10 +7,11 @@ import {
   Search,
   Shuffle,
 } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { usePostHog } from "@posthog/react";
 import { AddressApiError, fetchRandomAddress } from "./api";
 import { CityCombobox } from "./components/CityCombobox";
+import { LoadErrorBoundary } from "./components/LoadErrorBoundary";
 import type { View } from "./nav";
 import {
   AboutView,
@@ -38,8 +39,13 @@ const PROVINCES: Array<{ code: ProvinceCode | ""; name: string }> = [
   { code: "YT", name: "Yukon" },
 ];
 
+// The Facts page and its generated data add about 75 KB of JS (21 KB gzipped),
+// so they load on the first visit to the page instead of in the main bundle.
+const FactsView = lazy(() => import("./FactsView").then((m) => ({ default: m.FactsView })));
+
 const NAV: Array<{ key: View; label: string }> = [
   { key: "retriever", label: "Retriever" },
+  { key: "facts", label: "Fun Facts" },
   { key: "api", label: "API access" },
   { key: "about", label: "About" },
 ];
@@ -82,7 +88,19 @@ function getErrorMessage(error: unknown) {
 
 export function App() {
   const posthog = usePostHog();
-  const [view, setView] = useState<View>("retriever");
+  // Views are React state, not routes. The Facts table of contents links to
+  // #facts-* anchors, so a reload or shared link with one of those opens Facts.
+  const [view, setView] = useState<View>(() =>
+    window.location.hash.startsWith("#facts-") ? "facts" : "retriever"
+  );
+
+  useEffect(() => {
+    // Drop a stale #facts-* anchor on leaving Facts, so a reload stays put.
+    if (view !== "facts" && window.location.hash.startsWith("#facts-")) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, [view]);
+
   const [city, setCity] = useState("Burlington");
   const [province, setProvince] = useState<ProvinceCode | "">("ON");
   const [verbose, setVerbose] = useState(false);
@@ -391,6 +409,20 @@ export function App() {
           </>
         ) : null}
 
+        {view === "facts" ? (
+          <LoadErrorBoundary what="facts">
+            <Suspense
+              fallback={
+                <section className="page" aria-label="Fun Facts" aria-busy="true">
+                  <p className="eyebrow">Fun Facts</p>
+                  <p>Loading facts…</p>
+                </section>
+              }
+            >
+              <FactsView />
+            </Suspense>
+          </LoadErrorBoundary>
+        ) : null}
         {view === "api" ? <ApiAccessView /> : null}
         {view === "about" ? <AboutView /> : null}
         {view === "terms" ? <TermsView onNavigate={setView} /> : null}
