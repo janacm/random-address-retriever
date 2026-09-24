@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from "react";
-import { Database } from "lucide-react";
+import { Database, MapPin } from "lucide-react";
 import { FACTS } from "./facts";
 import {
   countOf,
@@ -10,6 +10,8 @@ import {
   formatNumber as n,
   formatPct as pct,
   formatShare,
+  googleMapsPointUrl,
+  googleMapsSearchUrl,
   isCityOrVille,
   joinList,
   ordinal,
@@ -127,6 +129,39 @@ function NumHead({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Table cell with a Google Maps link: a text search for parts, or a pin at
+ * exact coordinates when point is given. label names the place for screen readers.
+ */
+function MapCell({
+  label,
+  parts = [],
+  point,
+}: {
+  label: string;
+  parts?: string[];
+  point?: { lat: number; lon: number };
+}) {
+  return (
+    <td className="mapCell">
+      <a
+        className="factMapLink"
+        href={point ? googleMapsPointUrl(point.lat, point.lon) : googleMapsSearchUrl(...parts)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${label} on Google Maps`}
+      >
+        <MapPin aria-hidden="true" size={14} />
+        <span>Map</span>
+      </a>
+    </td>
+  );
+}
+
+function MapHead() {
+  return <th scope="col">Map</th>;
+}
+
 function place(name: string, province: string) {
   return `${name}, ${province}`;
 }
@@ -197,6 +232,7 @@ function SmallestSection() {
               <th scope="col">Prov.</th>
               <th scope="col">Type</th>
               <th scope="col">Address in the register</th>
+              <MapHead />
             </tr>
           </thead>
           <tbody>
@@ -208,6 +244,7 @@ function SmallestSection() {
                   <TypeCode code={m.csdType} />
                 </td>
                 <td>{m.address}</td>
+                <MapCell label={m.address} parts={[m.address]} />
               </tr>
             ))}
           </tbody>
@@ -266,6 +303,7 @@ function LargestSection() {
               <NumHead>Addresses</NumHead>
               <NumHead>Share of Canada</NumHead>
               <NumHead>Cumulative</NumHead>
+              <MapHead />
             </tr>
           </thead>
           <tbody>
@@ -280,6 +318,7 @@ function LargestSection() {
                 <Num>{n(m.addresses)}</Num>
                 <Num>{pct(m.pctOfCanada, 2)}</Num>
                 <Num>{pct(m.cumulativePct, 2)}</Num>
+                <MapCell label={place(m.name, m.province)} parts={[m.name, m.province]} />
               </tr>
             ))}
           </tbody>
@@ -392,6 +431,7 @@ function SizeSection() {
               <NumHead>Buildings</NumHead>
               <NumHead>Addresses</NumHead>
               <NumHead>Per building</NumHead>
+              <MapHead />
             </tr>
           </thead>
           <tbody>
@@ -401,6 +441,7 @@ function SizeSection() {
                 <Num>{n(b.buildings)}</Num>
                 <Num>{n(b.addresses)}</Num>
                 <Num>{n(b.addressesPerBuilding, 2)}</Num>
+                <MapCell label={place(b.name, b.province)} parts={[b.name, b.province]} />
               </tr>
             ))}
           </tbody>
@@ -687,6 +728,7 @@ function StreetsSection() {
               <th scope="col">Street</th>
               <NumHead>Addresses</NumHead>
               <NumHead>Buildings</NumHead>
+              <MapHead />
             </tr>
           </thead>
           <tbody>
@@ -695,6 +737,10 @@ function StreetsSection() {
                 <td>{`${s.street}, ${s.municipality}`}</td>
                 <Num>{n(s.addresses)}</Num>
                 <Num>{n(s.buildings)}</Num>
+                <MapCell
+                  label={`${s.street}, ${place(s.municipality, s.province)}`}
+                  parts={[s.street, s.municipality, s.province]}
+                />
               </tr>
             ))}
           </tbody>
@@ -809,6 +855,7 @@ function BuildingsSection() {
             <tr>
               <th scope="col">Building</th>
               <NumHead>Addresses</NumHead>
+              <MapHead />
             </tr>
           </thead>
           <tbody>
@@ -816,6 +863,10 @@ function BuildingsSection() {
               <tr key={`${b.address}-${b.municipality}`}>
                 <td>{`${b.address}, ${b.municipality}`}</td>
                 <Num>{n(b.addresses)}</Num>
+                <MapCell
+                  label={`${b.address}, ${place(b.municipality, b.province)}`}
+                  parts={[b.address, b.municipality, b.province]}
+                />
               </tr>
             ))}
           </tbody>
@@ -898,6 +949,7 @@ function GeographySection() {
               <th scope="col">Municipality</th>
               <NumHead>Latitude</NumHead>
               <NumHead>Longitude</NumHead>
+              <MapHead />
             </tr>
           </thead>
           <tbody>
@@ -908,6 +960,10 @@ function GeographySection() {
                 <td>{place(p.municipality, p.province)}</td>
                 <Num>{coordinate(p.lat, "N", "S", 6)}</Num>
                 <Num>{coordinate(p.lon, "E", "W", 6)}</Num>
+                <MapCell
+                  label={`${p.direction[0].toUpperCase() + p.direction.slice(1)}ernmost address, ${place(p.municipality, p.province)}`}
+                  point={{ lat: p.lat, lon: p.lon }}
+                />
               </tr>
             ))}
           </tbody>
@@ -951,6 +1007,7 @@ function GeographySection() {
             <tr>
               <th scope="col">Area</th>
               <th scope="col">Address</th>
+              <MapHead />
             </tr>
           </thead>
           <tbody>
@@ -958,6 +1015,7 @@ function GeographySection() {
               <tr key={f.fsa}>
                 <td>{f.fsa}</td>
                 <td>{f.address}</td>
+                <MapCell label={f.address} parts={[f.address]} />
               </tr>
             ))}
           </tbody>

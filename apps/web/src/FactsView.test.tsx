@@ -70,6 +70,51 @@ function card(container: HTMLElement, fact: string) {
 }
 
 describe("FactsView", () => {
+  it("adds a Google Maps link to every row of the place tables", async () => {
+    const facts = await realFacts();
+    const { container } = render(<FactsView />);
+    const maps = (fact: string) =>
+      within(card(container, fact))
+        .getAllByRole("link", { name: /on Google Maps$/ })
+        .map((a) => a as HTMLAnchorElement);
+    const query = (a: HTMLAnchorElement) => new URL(a.href).searchParams.get("query");
+
+    const oneAddress = maps("one-address-municipalities");
+    expect(oneAddress).toHaveLength(facts.smallestMunicipalities.municipalities.length);
+    const lbi = facts.smallestMunicipalities.municipalities.find((m) => m.name === "Little Bay Islands")!;
+    const lbiLink = oneAddress.find((a) => a.getAttribute("aria-label") === `${lbi.address} on Google Maps`)!;
+    expect(query(lbiLink)).toBe(`${lbi.address}, Canada`);
+    expect(lbiLink).toHaveAttribute("target", "_blank");
+    expect(lbiLink).toHaveAttribute("rel", "noopener noreferrer");
+
+    const top = maps("top-10-municipalities");
+    expect(top).toHaveLength(facts.topMunicipalities.top.length);
+    expect(top[0]).toHaveAccessibleName("Toronto, ON on Google Maps");
+    expect(query(top[0])).toBe("Toronto, ON, Canada");
+
+    expect(maps("montreal-most-buildings")).toHaveLength(facts.mostBuildings.top.length);
+
+    const street = facts.busiestStreets.byAddresses[0];
+    const streets = maps("busiest-single-street");
+    expect(streets).toHaveLength(facts.busiestStreets.byAddresses.length);
+    expect(query(streets[0])).toBe(`${street.street}, ${street.municipality}, ${street.province}, Canada`);
+
+    const building = facts.biggestBuildings.top[0];
+    const buildings = maps("biggest-building");
+    expect(buildings).toHaveLength(facts.biggestBuildings.top.length);
+    expect(query(buildings[0])).toBe(`${building.address}, ${building.municipality}, ${building.province}, Canada`);
+
+    const points = maps("geographic-extremes");
+    expect(points).toHaveLength(facts.extremes.points.length);
+    const north = facts.extremes.points[0];
+    expect(points[0]).toHaveAccessibleName(`Northernmost address, ${north.municipality}, ${north.province} on Google Maps`);
+    expect(query(points[0])).toBe(`${north.lat},${north.lon}`);
+
+    const fsas = maps("single-address-fsas");
+    expect(fsas).toHaveLength(facts.singleAddressFsas.list.length);
+    expect(query(fsas[0])).toBe(`${facts.singleAddressFsas.list[0].address}, Canada`);
+  });
+
   it("says the facts come from the full register without claiming what the retriever runs on", () => {
     render(<FactsView />);
     expect(

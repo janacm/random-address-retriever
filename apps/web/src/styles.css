@@ -1350,3 +1350,22 @@ button:disabled {
     padding: 14px;
   }
 }
+
+/* ---- Google Maps links in fact tables ---- */
+.factTable .mapCell {
+  white-space: nowrap;
+}
+
+.factMapLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #b21e14;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.factMapLink:hover,
+.factMapLink:focus-visible {
+  text-decoration: underline;
+}

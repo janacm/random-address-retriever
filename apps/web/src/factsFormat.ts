@@ -146,3 +146,18 @@ export function describeSmallest(row: ProvinceSmallest): string {
     "; "
   )}`;
 }
+
+/**
+ * A Google Maps search link for a place, the same way the retriever builds its
+ * "View on Google Maps" link: no API key, Maps resolves the text like its
+ * search box. Empty parts are dropped and "Canada" is appended.
+ */
+export function googleMapsSearchUrl(...parts: Array<string | null | undefined>): string {
+  const query = [...parts.filter((p): p is string => Boolean(p && p.trim())), "Canada"].join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+/** A Google Maps link that drops a pin on exact coordinates. */
+export function googleMapsPointUrl(lat: number, lon: number): string {
+  return `https://www.google.com/maps/search/?api=1&query=${lat}%2C${lon}`;
+}

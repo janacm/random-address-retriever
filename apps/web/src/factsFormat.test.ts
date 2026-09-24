@@ -8,6 +8,8 @@ import {
   formatNumber,
   formatPct,
   formatShare,
+  googleMapsPointUrl,
+  googleMapsSearchUrl,
   isCityOrVille,
   joinList,
   ordinal,
@@ -116,6 +118,32 @@ describe("describeSmallest", () => {
   it("points to the full table for large ties at one address", () => {
     expect(describeSmallest({ smallestAddresses: 1, smallestTied: 31, smallest: null })).toBe(
       "31 tied at 1 address, all in the table above"
+    );
+  });
+});
+
+describe("googleMapsSearchUrl", () => {
+  it("joins the parts, appends Canada and encodes the query", () => {
+    expect(googleMapsSearchUrl("Toronto", "ON")).toBe(
+      "https://www.google.com/maps/search/?api=1&query=Toronto%2C%20ON%2C%20Canada"
+    );
+    expect(googleMapsSearchUrl("14 Main ST, BIRCHY HEAD NL A0K 1K0")).toBe(
+      "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent("14 Main ST, BIRCHY HEAD NL A0K 1K0, Canada")
+    );
+  });
+
+  it("drops empty parts", () => {
+    expect(googleMapsSearchUrl("", "Ivujivik", null, undefined, "  ", "QC")).toBe(
+      "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Ivujivik, QC, Canada")
+    );
+  });
+});
+
+describe("googleMapsPointUrl", () => {
+  it("drops a pin at the coordinates", () => {
+    expect(googleMapsPointUrl(73.035343, -85.158072)).toBe(
+      "https://www.google.com/maps/search/?api=1&query=73.035343%2C-85.158072"
     );
   });
 });
