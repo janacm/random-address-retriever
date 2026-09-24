@@ -1,0 +1,38 @@
+# Random Address Retriever
+
+> Random Address Retriever returns a real, randomly selected Canadian address from Statistics Canada's National Address Register (NAR) — 17,169,294 addresses. Search by province and city to get a verifiable civic address, or use the same data through a simple JSON API. Independent project, not affiliated with any government department.
+
+Every result is a real address that maps back to source identifiers in the NAR; no address is invented. The dataset is adapted from Statistics Canada's National Address Register, available under the Statistics Canada Open Licence, and contains information licensed under the Open Government Licence – Yukon.
+
+## Using the tool
+
+- [Random Address Retriever (web app)](https://randomaddress.janac.me/): Pick a province and city, then retrieve a random Canadian address. Also has About, API access, Terms, and Privacy sections.
+
+## API
+
+The same data is available as a JSON API, same-origin under `/api`. A free tier covers random address lookups and city typeahead; verbose source identifiers and higher rate limits are available on request via the API access form on the site.
+
+- `GET /api/random-address?city={city}&province={PROV}&verbose={true|false}`: Return one random address for the given city. `province` is an optional two-letter code (e.g. `ON`); `verbose=true` adds the NAR source GUIDs (`loc_guid`, `addr_guid`).
+- `GET /api/cities?q={prefix}&province={PROV}&limit={n}`: City-name typeahead, optionally scoped to a province.
+- `GET /api/provinces`: List of Canadian provinces and territories with their two-letter codes.
+- `GET /healthz`: Service health check.
+
+Example:
+
+`curl "https://randomaddress.janac.me/api/random-address?city=Burlington&province=ON"`
+
+## Documentation
+
+- [Source code and docs (GitHub)](https://github.com/janacm/random-address-retriever): README, requirements, and data-source decisions.
+
+## Licensing & attribution
+
+- [Statistics Canada Open Licence](https://www.statcan.gc.ca/en/reference/licence)
+- [Open Government Licence – Yukon](https://open.yukon.ca/open-government-licence-yukon)
+
+When redistributing NAR-derived data, include: "Adapted from Statistics Canada, National Address Register. This does not constitute an endorsement by Statistics Canada of this product. Contains information licensed under the Open Government Licence – Yukon."
+
+## Notes
+
+- This is an independent project and is not affiliated with, endorsed by, or officially associated with Statistics Canada or any Government of Canada department.
+- The API is rate-limited and token-gated; automated crawlers should not hit `/api/*` (see robots.txt). Agents that want the data should use the documented endpoints above with a key.
