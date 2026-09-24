@@ -17,11 +17,13 @@ The full NAR import is 8.1 GB locally. Free hosted Postgres tiers are about
 - Rows without a city (15,729 in the July 2025 release) are dropped, because
   the API can only reach rows by city.
 
-Measured locally at the default 3,000,000 rows (about 17.5% of 17,169,294):
-`nar_addresses` is 341 MB with its index, the whole database 350 MB. That
-leaves roughly 150 MB for the provider's own system schemas and maintenance.
-Size scales at about 114 bytes per row, so adjust `SAMPLE_TARGET_ROWS` for a
-different tier.
+Measured at the default 3,000,000 rows (about 17.5% of 17,169,294):
+`nar_addresses` is 341 MiB with its index and the whole database 349 MiB, about
+119 bytes per row. On Neon the cap (`neon.max_cluster_size`, 512 MiB) counts
+every database in the cluster, and `postgres`, `template0`, and `template1`
+take about 22 MiB, so with the sample live the cluster is 372 MiB and has about
+140 MiB of headroom (measured 2026-09-24). Adjust `SAMPLE_TARGET_ROWS` for a
+different tier at roughly 119 bytes per row.
 
 ## Build and push
 
@@ -34,24 +36,52 @@ SAMPLE_DATABASE_URL='postgresql://USER:PASSWORD@HOST/DB?sslmode=require' ./scrip
 `sample-build.sh` only reads the full database and rebuilds the local
 `random_address_sample` database. By default `sample-push.sh` loads the rows
 into a `nar_staging` schema, builds the indexes and city view there, checks the
-row count, then swaps `nar_addresses` and `nar_cities` into `public` in one
+row and city counts, then swaps `nar_addresses` and `nar_cities` into `public` in one
 transaction. The API keeps serving the old data until the swap, and a failed or
 interrupted run drops the staging copy and leaves the live tables as they were.
 Keep the connection URL in your shell or `.env.local`; never commit it.
 
-Staging holds both copies at once, so the script first checks that the current
-database plus the sample fits under `SAMPLE_STORAGE_LIMIT_MB` (default 500) and
-refuses, changing nothing, if it doesn't. With the 3M-row sample already live
-(about 350 MB) a second staged copy would need about 690 MB, so on a 0.5 GB free
-tier replace the tables in place instead:
+Both modes start with a read-only pre-flight and refuse, changing nothing on
+the target, when:
+
+- the local sample has no rows, or its `nar_addresses` columns differ from what
+  `sql/sample-schema.sql` creates (COPY maps columns by position);
+- the sample covers fewer city/province pairs than the target serves, counted
+  from the address rows on both sides (set `SAMPLE_PUSH_ALLOW_SHRINK=1` if that
+  is intended);
+- the result would not fit the storage cap. The cap is Neon's
+  `neon.max_cluster_size` when the target reports it, else 500 MiB.
+  `SAMPLE_STORAGE_LIMIT_MB` (whole MiB) can lower it but not raise it above a
+  cap the target reports. Usage is measured across every database in the
+  cluster.
+
+Only after that does it install `pg_trgm` if missing and clear any leftover
+`nar_staging` from an earlier failed run.
+
+Staging holds both copies at once. With the 3M-row sample already live, a
+staged push needs about 713 MiB (372 MiB cluster plus the 341 MiB sample) of
+the 512 MiB cap, so on the free tier replace the tables in place instead (about
+372 MiB):
 
 ```bash
 SAMPLE_PUSH_IN_PLACE=1 SAMPLE_DATABASE_URL='...' ./scripts/sample-push.sh
 ```
 
-In-place mode drops the live tables before loading: random-address lookups find
-nothing and `/api/cities` errors until it finishes (about 40 s to Neon), and an
-interrupted run leaves the tables empty or partial until the push is re-run.
+In-place mode drops and recreates `nar_addresses` in one transaction, then
+loads it: random-address lookups find nothing until the COPY commits, and
+`/api/cities` errors until the city view is rebuilt at the end. On the prod Neon
+project on 2026-09-24, with the previous revision of this script (separate
+DROP statements, same load), the push took 44 s; random-address lookups
+returned nothing for about 35 s and `/api/cities` errored for about 40 s. A
+failed or interrupted run leaves the tables empty or partial until the push is
+re-run, and the script says so when it exits.
+
+Each full reload writes roughly 300 MB of WAL (an estimate: lifetime WAL divided
+by the two loads so far). Neon Free keeps 6 hours of history for instant
+restore; its plan pages give the cap as 1 GB in some places and 1 GB-month in
+others. At ~300 MB per reload, a fourth push within 6 hours would pass 1 GB,
+and the pages checked on 2026-09-24 don't say what happens then. If restoring
+to a pre-push point matters, space pushes out.
 
 ### Neon project
 
@@ -90,6 +120,13 @@ it from Database Settings > SSL Configuration and start the API with
 
 ## Provider notes
 
+- Collation: the Neon database uses the builtin provider with locale
+  `C.UTF-8`, so `lower('MONTRÉAL')` is `montréal`. The local cluster is plain
+  `C`, where `lower()` leaves non-ASCII letters alone. Any input whose accented
+  letters differ in case from the stored name (`MONTRÉAL` for Montréal, or
+  `sept-îles` for Sept-Îles) matches on Neon but not locally, in both the random
+  pick and `/api/cities`. City names in the data have no case variants, so the
+  sample itself is the same on both.
 - Neon: compute suspends after 5 minutes idle and wakes on the next connection,
   so the first request after a quiet period is slower. 100 CU-hours per month.
 - Supabase: free projects pause after 1 week of inactivity and stay paused until

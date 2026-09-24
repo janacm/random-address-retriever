@@ -7,11 +7,13 @@
 -- (16 bytes vs 37 as text); every NAR GUID is lower-case, so the API returns
 -- the same strings it does locally.
 --
--- Loaded by scripts/sample-build.sh (into a fresh local database) and
--- scripts/sample-push.sh (into a staging schema, via search_path). Names are
--- unqualified and nothing is dropped here, so the file only ever creates
--- relations in the first schema on the search_path. Indexes and the city view
--- are created after the bulk COPY (sql/sample-indexes.sql).
+-- Loaded by scripts/sample-build.sh (into a fresh local database) and by
+-- scripts/sample-push.sh, which uses it three ways via search_path: into
+-- nar_staging for a staged push, into public inside the in-place drop/recreate
+-- transaction, and into a rolled-back probe schema to check the local sample's
+-- column layout. Names are unqualified and nothing is dropped here, so the file
+-- only ever creates relations in the first schema on the search_path. Indexes
+-- and the city view are created after the bulk COPY (sql/sample-indexes.sql).
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
