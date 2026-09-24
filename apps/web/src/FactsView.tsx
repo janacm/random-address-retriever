@@ -669,7 +669,7 @@ function StreetsSection() {
           {`That is more than any other exact street address. Next come ${rSecond.address} (${n(rSecond.municipalities)}) and ${rThird.address} (${n(rThird.municipalities)}), then ${tiedText}.`}
         </p>
         <p>
-          {`A direction counts as part of the address here, so ${rFirst.address} N is a different address. Ignoring directions, ${joinList(repeated.ignoringDirection.map((r) => r.address))} leads with ${n(repeated.ignoringDirection[0].municipalities)}.`}
+          {`Suffixed numbers such as 12A and directions both count as part of the address here, so ${rFirst.address} N is a different address. Ignoring directions, ${joinList(repeated.ignoringDirection.map((r) => r.address))} leads with ${n(repeated.ignoringDirection[0].municipalities)}.`}
         </p>
       </FactCard>
 

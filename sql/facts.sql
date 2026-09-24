@@ -716,21 +716,24 @@ SELECT 'busiestStreets', json_build_object(
     'fourthBuildings', (SELECT bldgs FROM sm ORDER BY bldgs DESC LIMIT 1 OFFSET 3)
 );
 
--- Exact street addresses (number, name, type, direction; no suffix) by the
--- number of municipalities that have one.
+-- Exact street addresses (number, suffix, name, type, direction) by the number
+-- of municipalities that have one. A suffixed number such as 12A is its own
+-- address, distinct from 12.
 CREATE TEMP TABLE rep AS
-SELECT civic_no, nm, typ, dir, count(*) AS csds
-FROM (SELECT DISTINCT civic_no, nm, coalesce(typ, '') AS typ, coalesce(dir, '') AS dir, csd_code
+SELECT civic_no, sfx, nm, typ, dir, count(*) AS csds
+FROM (SELECT DISTINCT civic_no, coalesce(civic_no_suffix, '') AS sfx, nm,
+             coalesce(typ, '') AS typ, coalesce(dir, '') AS dir, csd_code
       FROM ac
-      WHERE csd_code IS NOT NULL AND nm IS NOT NULL AND civic_no IS NOT NULL AND civic_no_suffix IS NULL) d
-GROUP BY 1, 2, 3, 4;
+      WHERE csd_code IS NOT NULL AND nm IS NOT NULL AND civic_no IS NOT NULL) d
+GROUP BY 1, 2, 3, 4, 5;
 
 CREATE TEMP TABLE rep_nodir AS
-SELECT civic_no, nm, typ, count(*) AS csds
-FROM (SELECT DISTINCT civic_no, nm, coalesce(typ, '') AS typ, csd_code
+SELECT civic_no, sfx, nm, typ, count(*) AS csds
+FROM (SELECT DISTINCT civic_no, coalesce(civic_no_suffix, '') AS sfx, nm,
+             coalesce(typ, '') AS typ, csd_code
       FROM ac
-      WHERE csd_code IS NOT NULL AND nm IS NOT NULL AND civic_no IS NOT NULL AND civic_no_suffix IS NULL) d
-GROUP BY 1, 2, 3;
+      WHERE csd_code IS NOT NULL AND nm IS NOT NULL AND civic_no IS NOT NULL) d
+GROUP BY 1, 2, 3, 4;
 
 INSERT INTO facts (key, value)
 WITH cut AS (SELECT csds FROM rep ORDER BY csds DESC LIMIT 1 OFFSET 4)
@@ -738,14 +741,16 @@ SELECT 'repeatedAddresses', json_build_object(
     -- the top five plus anything tied with fifth place
     'top', (
         SELECT json_agg(json_build_object(
-            'address', concat_ws(' ', r.civic_no, d.street, nullif(r.typ, ''), nullif(r.dir, '')),
-            'municipalities', r.csds) ORDER BY r.csds DESC, r.civic_no::int, r.nm)
+            'address', pg_temp.fmt_street(NULL, r.civic_no, nullif(r.sfx, ''), d.street,
+                                          nullif(r.typ, ''), nullif(r.dir, '')),
+            'municipalities', r.csds) ORDER BY r.csds DESC, r.civic_no::int, r.sfx, r.nm)
         FROM rep r JOIN sdisp d USING (nm)
         WHERE r.csds >= cut.csds),
     'ignoringDirection', (
         SELECT json_agg(json_build_object(
-            'address', concat_ws(' ', r.civic_no, d.street, nullif(r.typ, '')),
-            'municipalities', r.csds) ORDER BY r.civic_no::int, r.nm)
+            'address', pg_temp.fmt_street(NULL, r.civic_no, nullif(r.sfx, ''), d.street,
+                                          nullif(r.typ, ''), NULL),
+            'municipalities', r.csds) ORDER BY r.civic_no::int, r.sfx, r.nm)
         FROM rep_nodir r JOIN sdisp d USING (nm)
         WHERE r.csds = (SELECT max(csds) FROM rep_nodir))
 )
