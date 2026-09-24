@@ -51,6 +51,16 @@ describe("loadConfig", () => {
     expect(config.pg.port).toBe(5432);
   });
 
+  it("reads DATABASE_URL and leaves it unset when blank", () => {
+    const url = "postgresql://u:p@ep-example.us-east-2.aws.neon.tech/neondb?sslmode=require";
+    expect(loadConfig({ ADDRESS_API_TOKEN: "s", DATABASE_URL: url }).pg.connectionString).toBe(
+      url,
+    );
+    expect(loadConfig({ ADDRESS_API_TOKEN: "s", DATABASE_URL: " " }).pg.connectionString).toBe(
+      undefined,
+    );
+  });
+
   it("rejects an out-of-range port", () => {
     expect(() =>
       loadConfig({ ADDRESS_API_TOKEN: "secret", ADDRESS_API_PORT: "70000" }),

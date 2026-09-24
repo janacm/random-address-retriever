@@ -20,6 +20,11 @@ export interface Config {
     max: number;
   };
   pg: {
+    /**
+     * `DATABASE_URL` when set (Neon injects it into a deployed Function).
+     * Takes precedence over the discrete fields below.
+     */
+    connectionString?: string | undefined;
     host: string;
     port: number;
     database: string;
@@ -101,6 +106,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       ),
     },
     pg: {
+      connectionString: env.DATABASE_URL?.trim() || undefined,
       host: env.PGHOST?.trim() || "127.0.0.1",
       port: parseIntInRange(env.PGPORT, 55432, "PGPORT", 1, 65535),
       database: env.PGDATABASE?.trim() || "random_address_retriever",

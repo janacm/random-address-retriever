@@ -1,5 +1,10 @@
 # Cloudflare Tunnel And Netlify
 
+> **Retired 2026-09-24.** Production no longer uses the tunnel: the API runs
+> as a Neon Function and Netlify's edge proxy calls it directly. See
+> [DEPLOY.md](DEPLOY.md). This page is kept for the setup history and the
+> launchd/TCC troubleshooting notes.
+
 ## Architecture
 
 Expose only the local HTTP API, not Postgres:

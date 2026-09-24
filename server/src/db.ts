@@ -74,17 +74,33 @@ const SELECT_FIELDS = `
   addr_guid
 `;
 
-export function createPgDatabase(config: Config): Database {
-  const pool = new pg.Pool({
-    host: config.pg.host,
-    port: config.pg.port,
-    database: config.pg.database,
-    user: config.pg.user,
-    password: config.pg.password,
+/**
+ * Build the connection pool. A `DATABASE_URL` replaces the discrete PG* fields
+ * entirely, so a partial URL never picks up a local default (such as the OS
+ * user name) by accident.
+ */
+export function createPgPool(config: Config): pg.Pool {
+  const target = config.pg.connectionString
+    ? { connectionString: config.pg.connectionString }
+    : {
+        host: config.pg.host,
+        port: config.pg.port,
+        database: config.pg.database,
+        user: config.pg.user,
+        password: config.pg.password,
+      };
+  return new pg.Pool({
+    ...target,
     max: config.pg.max,
     statement_timeout: config.pg.statementTimeoutMs || undefined,
     application_name: "random-address-api",
   });
+}
+
+export function createPgDatabase(
+  config: Config,
+  pool: pg.Pool = createPgPool(config),
+): Database {
 
   async function randomAddress(
     query: RandomAddressQuery,

@@ -102,7 +102,11 @@ enabled on `production`). Preview changes with `neon config plan`, apply with
 
 ## Pointing the API at the hosted database
 
-The API reads standard libpq variables, and `pg` honours `PGSSLMODE`:
+In production the API runs as a Neon Function on the `production` branch, and
+Neon injects `DATABASE_URL` for it (see [DEPLOY.md](DEPLOY.md)). To run the
+local Node server against the hosted database instead, set `DATABASE_URL`
+(the API prefers it over the `PG*` variables), or use the standard libpq
+variables, since `pg` honours `PGSSLMODE`:
 
 ```text
 PGHOST=<host from the provider dashboard>

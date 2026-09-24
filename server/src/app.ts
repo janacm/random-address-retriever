@@ -91,11 +91,16 @@ export function buildApp({ db, config }: AppDeps): FastifyInstance {
       .send({ error: { code: "not_found", message: "Route not found." } });
   });
 
-  app.get("/healthz", async () => {
+  const health = async () => {
     const startedAt = process.hrtime.bigint();
     const { database } = await db.ping();
     return { data: { ok: true, database, durationMs: elapsedMs(startedAt) } };
-  });
+  };
+  // Neon Functions answer an exact `/healthz` at the platform with a plain-text
+  // "ok" and never reach this app, so the deployed API serves its DB-backed
+  // check at `/api/healthz`. `/healthz` stays for the local API and scripts.
+  app.get("/healthz", health);
+  app.get("/api/healthz", health);
 
   app.get("/api/provinces", async () => ({ data: PROVINCES }));
 

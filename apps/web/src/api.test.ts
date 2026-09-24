@@ -83,6 +83,6 @@ describe("checkHealth", () => {
     const body = { data: { ok: true, database: "db", durationMs: 1 } };
     const fetchSpy = mockFetch(jsonResponse(body));
     await expect(checkHealth()).resolves.toEqual(body);
-    expect(fetchSpy.mock.calls[0][0]).toBe("/healthz");
+    expect(fetchSpy.mock.calls[0][0]).toBe("/api/healthz");
   });
 });

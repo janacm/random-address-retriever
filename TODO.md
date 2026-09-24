@@ -11,16 +11,15 @@
   - DS220j is memory constrained for this dataset
   - Postgres should not use an SMB/NFS-mounted data directory
   - Synology internal DSM PostgreSQL should not be used for app data
-- [ ] Run the live backend from the MacBook:
-  - local Postgres on `127.0.0.1:55432`
-  - small local HTTP API, not direct Postgres exposure
-  - Cloudflare Tunnel in front of the API
-  - Netlify Next.js server route calls the tunneled API with private credentials
-- [ ] Revisit a dedicated always-on host if this needs production-like reliability:
-  - Mac mini
-  - small Linux mini PC
-  - newer Synology `+` model
-  - managed Postgres provider
+- [x] ~~Run the live backend from the MacBook behind a Cloudflare Tunnel.~~
+  Retired 2026-09-24; the site was down whenever the Mac was off.
+- [x] Move the live backend to managed hosting (2026-09-24, see
+  [docs/DEPLOY.md](docs/DEPLOY.md)):
+  - 3M-row sample on Neon Postgres
+  - the same Fastify API as a Neon Function next to it
+  - Netlify Edge Function proxy injects the bearer token
+- [ ] Delete the `random-address-api` Cloudflare Tunnel and its
+  `address-api.janac.me` DNS record once the Neon path has run for a while.
 
 ## Backend API
 
@@ -53,7 +52,8 @@
 - [ ] Add a backup script using `pg_dump`.
 - [ ] Add a restore script or documented restore command.
 - [x] Add a health-check script for Postgres and the local API.
-- [ ] Document how to restart the tunnel and API after reboot.
+- [x] ~~Document how to restart the tunnel and API after reboot.~~ No longer
+  needed: nothing in production runs on a local machine.
 
 ## Product Questions
 

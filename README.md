@@ -1,14 +1,16 @@
 # Random Address Retriever
 
-Local National Address Register search/retrieval workspace.
+National Address Register search/retrieval workspace.
 
 ## Current State
 
-- Git is initialized for project scripts and docs.
+- The public site runs entirely on hosted services: the web app on Netlify,
+  the API as a Neon Function, and a 3M-row sample of the data in Neon Postgres.
+  See [Deployment](docs/DEPLOY.md).
 - Large source datasets, GeoJSON files, and local database storage are ignored by Git.
-- Postgres 16 is running locally on port `55432`.
-- The full NAR CSV dataset has been imported into `nar_addresses`.
-- A local HTTP API is available from `server/` (Fastify + TypeScript).
+- For development, Postgres 16 runs locally on port `55432` with the full NAR
+  CSV dataset imported into `nar_addresses`.
+- The HTTP API lives in `server/` (Fastify + TypeScript).
 - A React frontend is available from `apps/web`.
 - Verified row count: `17,169,294`.
 - Verified Burlington rows:
@@ -155,9 +157,10 @@ along with the regenerated JSON or CI will fail.
 
 The API is a strongly-typed [Fastify](https://fastify.dev) + TypeScript service
 in [`server/`](server/) that uses a pooled `pg` connection (see
-[server/README.md](server/README.md)). It listens on `127.0.0.1:8787` and
-requires `ADDRESS_API_TOKEN` on every request. Expose it through Cloudflare
-Tunnel and Cloudflare Access; never expose Postgres directly.
+[server/README.md](server/README.md)). Locally it listens on `127.0.0.1:8787`
+and requires `ADDRESS_API_TOKEN` on every request. In production the same app
+runs as a Neon Function next to the hosted database; see
+[Deployment](docs/DEPLOY.md). Never expose Postgres directly.
 
 ```bash
 ./scripts/db-optimize.sh   # one-time: build covering index + VACUUM ANALYZE
@@ -223,6 +226,7 @@ limiting on any exposed endpoint.
 - [Requirements](REQUIREMENTS.md)
 - [Findings and learnings](docs/LEARNINGS.md)
 - [FATRIOT link speed & cabling](docs/FATRIOT-LINK-AND-CABLING.md)
-- [Cloudflare Tunnel and Netlify setup](docs/CLOUDFLARE_NETLIFY.md)
+- [Deployment (Netlify + Neon Function)](docs/DEPLOY.md)
+- [Cloudflare Tunnel and Netlify setup](docs/CLOUDFLARE_NETLIFY.md) (retired)
 - [NAR reference files](docs/reference/)
 - [TODO](TODO.md)

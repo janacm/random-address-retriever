@@ -283,6 +283,15 @@ describe("GET /healthz", () => {
     const res = await app.inject({ method: "GET", url: "/healthz" });
     expect(res.statusCode).toBe(401);
   });
+
+  it("is also served at /api/healthz, which Neon Functions pass through", async () => {
+    app = buildApp({ db: fakeDb(), config });
+    const res = await app.inject({ method: "GET", url: "/api/healthz", headers: authHeader });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().data).toMatchObject({ ok: true, database: "test_db" });
+    const unauthenticated = await app.inject({ method: "GET", url: "/api/healthz" });
+    expect(unauthenticated.statusCode).toBe(401);
+  });
 });
 
 describe("CORS", () => {
