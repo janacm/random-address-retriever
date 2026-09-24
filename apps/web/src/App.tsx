@@ -45,7 +45,7 @@ const FactsView = lazy(() => import("./FactsView").then((m) => ({ default: m.Fac
 
 const NAV: Array<{ key: View; label: string }> = [
   { key: "retriever", label: "Retriever" },
-  { key: "facts", label: "Facts" },
+  { key: "facts", label: "Fun Facts" },
   { key: "api", label: "API access" },
   { key: "about", label: "About" },
 ];
@@ -413,8 +413,8 @@ export function App() {
           <LoadErrorBoundary what="facts">
             <Suspense
               fallback={
-                <section className="page" aria-label="Facts" aria-busy="true">
-                  <p className="eyebrow">Facts</p>
+                <section className="page" aria-label="Fun Facts" aria-busy="true">
+                  <p className="eyebrow">Fun Facts</p>
                   <p>Loading facts…</p>
                 </section>
               }

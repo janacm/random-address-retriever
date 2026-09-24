@@ -1016,7 +1016,7 @@ export function FactsView() {
   const top = FACTS.topMunicipalities.top[0];
 
   return (
-    <section className="page factsPage" aria-label="Facts">
+    <section className="page factsPage" aria-label="Fun Facts">
       <div className="pageIntro">
         <p className="eyebrow">Facts</p>
         <h2>Facts from the National Address Register</h2>

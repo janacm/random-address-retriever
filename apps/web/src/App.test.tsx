@@ -245,23 +245,23 @@ describe("App navigation", () => {
     expect(window.location.hash).toBe("");
   });
 
-  it("opens the Facts page from the nav, right after Retriever", async () => {
+  it("opens the Fun Facts page from the nav, right after Retriever", async () => {
     const user = userEvent.setup();
     render(<App />);
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(within(nav).getAllByRole("button").map((b) => b.textContent)).toEqual([
       "Retriever",
-      "Facts",
+      "Fun Facts",
       "API access",
       "About",
     ]);
 
-    await user.click(within(nav).getByRole("button", { name: "Facts" }));
+    await user.click(within(nav).getByRole("button", { name: "Fun Facts" }));
     // lazy-loaded, so the heading arrives after the Suspense fallback
     expect(
       await screen.findByRole("heading", { level: 2, name: "Facts from the National Address Register" })
     ).toBeInTheDocument();
-    expect(within(nav).getByRole("button", { name: "Facts" })).toHaveAttribute("aria-current", "page");
+    expect(within(nav).getByRole("button", { name: "Fun Facts" })).toHaveAttribute("aria-current", "page");
     expect(screen.queryByText("No address yet")).not.toBeInTheDocument();
 
     await user.click(within(nav).getByRole("button", { name: "Retriever" }));
