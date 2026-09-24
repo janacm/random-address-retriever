@@ -7,13 +7,13 @@
 -- (16 bytes vs 37 as text); every NAR GUID is lower-case, so the API returns
 -- the same strings it does locally.
 --
--- Loaded by scripts/sample-build.sh (local copy) and scripts/sample-push.sh
--- (hosted copy). Indexes and the city view are created after the bulk COPY.
+-- Loaded by scripts/sample-build.sh (into a fresh local database) and
+-- scripts/sample-push.sh (into a staging schema, via search_path). Names are
+-- unqualified and nothing is dropped here, so the file only ever creates
+-- relations in the first schema on the search_path. Indexes and the city view
+-- are created after the bulk COPY (sql/sample-indexes.sql).
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
-DROP MATERIALIZED VIEW IF EXISTS nar_cities;
-DROP TABLE IF EXISTS nar_addresses;
 
 CREATE TABLE nar_addresses (
     loc_guid uuid NOT NULL,

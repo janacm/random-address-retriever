@@ -32,10 +32,26 @@ SAMPLE_DATABASE_URL='postgresql://USER:PASSWORD@HOST/DB?sslmode=require' ./scrip
 ```
 
 `sample-build.sh` only reads the full database and rebuilds the local
-`random_address_sample` database. `sample-push.sh` drops and recreates
-`nar_addresses` and `nar_cities` on the target, copies the rows, builds the
-indexes, and checks that the row counts match. Keep the connection URL in your
-shell or `.env.local`; never commit it.
+`random_address_sample` database. By default `sample-push.sh` loads the rows
+into a `nar_staging` schema, builds the indexes and city view there, checks the
+row count, then swaps `nar_addresses` and `nar_cities` into `public` in one
+transaction. The API keeps serving the old data until the swap, and a failed or
+interrupted run drops the staging copy and leaves the live tables as they were.
+Keep the connection URL in your shell or `.env.local`; never commit it.
+
+Staging holds both copies at once, so the script first checks that the current
+database plus the sample fits under `SAMPLE_STORAGE_LIMIT_MB` (default 500) and
+refuses, changing nothing, if it doesn't. With the 3M-row sample already live
+(about 350 MB) a second staged copy would need about 690 MB, so on a 0.5 GB free
+tier replace the tables in place instead:
+
+```bash
+SAMPLE_PUSH_IN_PLACE=1 SAMPLE_DATABASE_URL='...' ./scripts/sample-push.sh
+```
+
+In-place mode drops the live tables before loading: random-address lookups find
+nothing and `/api/cities` errors until it finishes (about 40 s to Neon), and an
+interrupted run leaves the tables empty or partial until the push is re-run.
 
 ### Neon project
 
