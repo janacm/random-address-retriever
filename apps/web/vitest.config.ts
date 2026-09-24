@@ -1,11 +1,9 @@
 import { defineConfig } from "vitest/config";
 
-// Separate from vite.config.ts on purpose: that file loads @vitejs/plugin-react
-// and the PostHog plugin, built for Vite 8, while Vitest 3 runs on Vite 6 (see
-// the vitest>vite override in the root package.json). esbuild's automatic JSX
-// runtime is all the tests need.
+// Separate from vite.config.ts on purpose: tests don't need the PostHog upload
+// or Netlify Forms dev plugins, and oxc's automatic JSX runtime is all they need.
 export default defineConfig({
-  esbuild: { jsx: "automatic" },
+  oxc: { jsx: { runtime: "automatic" } },
   test: {
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}"],

@@ -14,7 +14,6 @@
   },
   "pnpm": {
     "overrides": {
-      "vitest>vite": "6.4.3",
       "tsup>esbuild": "0.28.1"
     }
   },

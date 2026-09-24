@@ -1,4 +1,5 @@
 import Fastify, {
+  LogController,
   type FastifyError,
   type FastifyInstance,
 } from "fastify";
@@ -43,7 +44,9 @@ function elapsedMs(startedAt: bigint): number {
 export function buildApp({ db, config }: AppDeps): FastifyInstance {
   const app = Fastify({
     logger: config.logger,
-    disableRequestLogging: !config.logger,
+    logController: new LogController({
+      disableRequestLogging: !config.logger,
+    }),
   }).withTypeProvider<TypeBoxTypeProvider>();
 
   // Order matters: CORS answers preflight before auth can reject it; the rate

@@ -19,16 +19,16 @@
   },
   "dependencies": {
     "@fastify/type-provider-typebox": "^5",
-    "fastify": "^5",
+    "fastify": "^5.12.5",
     "pg": "^8"
   },
   "devDependencies": {
     "@types/node": "^22",
     "@types/pg": "^8",
-    "@vitest/coverage-v8": "3.2.6",
+    "@vitest/coverage-v8": "4.1.11",
     "tsup": "^8",
     "tsx": "^4",
     "typescript": "^5",
-    "vitest": "^3"
+    "vitest": "^4.1.11"
   }
 }
