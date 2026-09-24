@@ -70,11 +70,64 @@ function card(container: HTMLElement, fact: string) {
 }
 
 describe("FactsView", () => {
+  it("links the specific addresses named in card text to Google Maps", async () => {
+    const facts = await realFacts();
+    const { container } = render(<FactsView />);
+    const link = (fact: string, label: string) =>
+      within(card(container, fact)).getByRole("link", { name: `${label} on Google Maps` }) as HTMLAnchorElement;
+    const query = (a: HTMLAnchorElement) => new URL(a.href).searchParams.get("query");
+
+    const lone = facts.loneliest.top;
+    for (const b of lone) {
+      const a = link("loneliest-building", `${b.address}, ${b.municipality}, ${b.province}`);
+      expect(query(a)).toBe(`${b.address}, ${b.municipality}, ${b.province}, Canada`);
+      expect(a).toHaveAttribute("target", "_blank");
+    }
+    const nearest = lone[0].nearest;
+    expect(
+      query(
+        link(
+          "loneliest-building",
+          `${nearest.address}, ${nearest.municipality}, ${nearest.province} (nearest to ${lone[0].municipality})`
+        )
+      )
+    ).toBe(`${nearest.address}, ${nearest.municipality}, ${nearest.province}, Canada`);
+
+    const high = facts.highestCivic;
+    expect(query(link("highest-civic-number", high.address))).toBe(`${high.address}, Canada`);
+
+    const longest = facts.houseDescriptions.longest[0];
+    expect(
+      query(link("house-description-labels", `${longest.address}, ${longest.municipality}, ${longest.province}`))
+    ).toBe(`${longest.address}, ${longest.municipality}, ${longest.province}, Canada`);
+
+    const tuk = facts.extremes.northWithStreet;
+    expect(query(link("geographic-extremes", `${tuk.address}, ${tuk.municipality}, ${tuk.province}`))).toBe(
+      `${tuk.lat},${tuk.lon}`
+    );
+
+    const lbi = facts.littleBayIslands;
+    expect(query(link("one-address-municipalities", `${lbi.address} (Little Bay Islands)`))).toBe(
+      `${lbi.address}, Canada`
+    );
+  });
+
+  it("omits the Ivujivik link when it is no longer a one-address municipality", async () => {
+    const facts = await realFacts();
+    facts.smallestMunicipalities.municipalities = facts.smallestMunicipalities.municipalities.filter(
+      (m) => m.name !== facts.extremes.northernmostInQuebec.municipality
+    );
+    holder.facts = facts;
+    const { container } = render(<FactsView />);
+    const row = card(container, "one-address-municipalities").querySelector(".factMapLinks")!;
+    expect(within(row as HTMLElement).getAllByRole("link")).toHaveLength(1);
+  });
+
   it("adds a Google Maps link to every row of the place tables", async () => {
     const facts = await realFacts();
     const { container } = render(<FactsView />);
     const maps = (fact: string) =>
-      within(card(container, fact))
+      within(card(container, fact).querySelector("table")!)
         .getAllByRole("link", { name: /on Google Maps$/ })
         .map((a) => a as HTMLAnchorElement);
     const query = (a: HTMLAnchorElement) => new URL(a.href).searchParams.get("query");

@@ -1369,3 +1369,16 @@ button:disabled {
 .factMapLink:focus-visible {
   text-decoration: underline;
 }
+
+.factMapLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  font-size: 0.87rem;
+}
+
+.factMapLinks > span {
+  color: #5a675f;
+  font-weight: 680;
+}

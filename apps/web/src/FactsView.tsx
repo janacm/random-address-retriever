@@ -129,24 +129,20 @@ function NumHead({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Table cell with a Google Maps link: a text search for parts, or a pin at
- * exact coordinates when point is given. label names the place for screen readers.
- */
-function MapCell({
-  label,
-  parts = [],
-  point,
-}: {
-  label: string;
-  parts?: string[];
-  point?: { lat: number; lon: number };
-}) {
+/** Where a Maps link points: a text search for parts, or a pin at exact coordinates. */
+type MapTarget = { parts?: string[]; point?: { lat: number; lon: number } };
+
+function mapsHref({ parts = [], point }: MapTarget) {
+  return point ? googleMapsPointUrl(point.lat, point.lon) : googleMapsSearchUrl(...parts);
+}
+
+/** Table cell with a Google Maps link; label names the place for screen readers. */
+function MapCell({ label, ...target }: MapTarget & { label: string }) {
   return (
     <td className="mapCell">
       <a
         className="factMapLink"
-        href={point ? googleMapsPointUrl(point.lat, point.lon) : googleMapsSearchUrl(...parts)}
+        href={mapsHref(target)}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`${label} on Google Maps`}
@@ -155,6 +151,28 @@ function MapCell({
         <span>Map</span>
       </a>
     </td>
+  );
+}
+
+/** A row of Google Maps links for the specific addresses a card's text names. */
+function MapLinks({ links }: { links: Array<MapTarget & { label: string }> }) {
+  return (
+    <p className="factMapLinks">
+      <span>On Google Maps:</span>
+      {links.map(({ label, ...target }) => (
+        <a
+          key={label}
+          className="factMapLink"
+          href={mapsHref(target)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${label} on Google Maps`}
+        >
+          <MapPin aria-hidden="true" size={14} />
+          <span>{label}</span>
+        </a>
+      ))}
+    </p>
   );
 }
 
@@ -225,6 +243,12 @@ function SmallestSection() {
             {`Another member, ${place(ivujivik.name, ivujivik.province)}, has the northernmost geocoded address in Quebec: ${ivujivik.address}.`}
           </p>
         ) : null}
+        <MapLinks
+          links={[
+            { label: `${lbi.address} (Little Bay Islands)`, parts: [lbi.address] },
+            ...(ivujivik ? [{ label: ivujivik.address, parts: [ivujivik.address] }] : []),
+          ]}
+        />
         <Table caption={`All ${n(smallest.count)} one-address municipalities, by province`} tall>
           <thead>
             <tr>
@@ -815,6 +839,7 @@ function NumbersSection() {
         <p>
           {`It is ${high.address}, in ${place(high.municipality, high.province)}. All ${n(high.sameStreetInMunicipality.addresses)} addresses on ${high.street} in ${high.municipality} are numbered between ${high.sameStreetInMunicipality.min} and ${high.sameStreetInMunicipality.max}. Nationally, ${n(high.sixDigit)} addresses have six-digit civic numbers${high.sevenPlusDigit === 0 ? " and none has seven" : ""}.`}
         </p>
+        <MapLinks links={[{ label: high.address, parts: [high.address] }]} />
       </FactCard>
 
       <FactCard
@@ -892,6 +917,14 @@ function BuildingsSection() {
           {`The longest unit label in the register, at ${n(longest.length)} characters, belongs to ${longest.address} in ${place(longest.municipality, longest.province)}:`}
         </p>
         <blockquote className="factQuote">{longest.label}</blockquote>
+        <MapLinks
+          links={[
+            {
+              label: `${longest.address}, ${place(longest.municipality, longest.province)}`,
+              parts: [longest.address, longest.municipality, longest.province],
+            },
+          ]}
+        />
         <p>
           {`Unit labels that mention trim, floors or windows: ${joinList(
             house.descriptiveByProvince.map((p) => `${n(p.labels)} in ${PROVINCE_NAMES[p.province]}`)
@@ -941,6 +974,14 @@ function GeographySection() {
               : "."
           } The northernmost address with a street is ${ex.northWithStreet.address} in ${place(ex.northWithStreet.municipality, ex.northWithStreet.province)}, at ${coordinate(ex.northWithStreet.lat, "N", "S", 6)}.`}
         </p>
+        <MapLinks
+          links={[
+            {
+              label: `${ex.northWithStreet.address}, ${place(ex.northWithStreet.municipality, ex.northWithStreet.province)}`,
+              point: { lat: ex.northWithStreet.lat, lon: ex.northWithStreet.lon },
+            },
+          ]}
+        />
         <Table caption="The farthest addresses in each direction">
           <thead>
             <tr>
@@ -984,6 +1025,18 @@ function GeographySection() {
               : ""
           }.`}
         </p>
+        <MapLinks
+          links={[
+            ...lone.top.map((b) => ({
+              label: `${b.address}, ${place(b.municipality, b.province)}`,
+              parts: [b.address, b.municipality, b.province],
+            })),
+            {
+              label: `${first.nearest.address}, ${place(first.nearest.municipality, first.nearest.province)} (nearest to ${first.municipality})`,
+              parts: [first.nearest.address, first.nearest.municipality, first.nearest.province],
+            },
+          ]}
+        />
         <p className="factNote">
           {`These distances measure the register's coverage as much as geography: ${joinList(
             lone.top.map(coverage),
